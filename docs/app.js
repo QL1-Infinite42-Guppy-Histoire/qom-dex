@@ -69,8 +69,17 @@ document.querySelectorAll(".tab").forEach(b=> b.onclick = ()=>{ document.querySe
 async function connect(){
   if(!window.ethereum){ alert("MetaMask not found."); return; }
   provider = new ethers.BrowserProvider(window.ethereum);
-  try{ await provider.send("wallet_switchEthereumChain", [{chainId: "0x"+CFG.chainId.toString(16)}]); }
-  catch(e){ if(e.code===4902 || /Unrecognized|not added/i.test(e.message||"")){ await provider.send("wallet_addEthereumChain", [{chainId:"0x"+CFG.chainId.toString(16), chainName:CFG.chainName, nativeCurrency:{name:"QOMX",symbol:"QOMX",decimals:18}, rpcUrls:[CFG.rpcUrl], blockExplorerUrls:[CFG.explorer]}]); } else throw e; }
+  const hexId = "0x"+CFG.chainId.toString(16);
+  const addParams = [{chainId:hexId, chainName:CFG.chainName, nativeCurrency:{name:"QOMX",symbol:"QOMX",decimals:18}, rpcUrls:[CFG.rpcUrl], blockExplorerUrls:[CFG.explorer]}];
+  // MetaMask mobile wraps the 4902 "chain not added" error so ethers shows
+  // only "could not coalesce error" and the code is lost. Do NOT branch on
+  // the switch error: on ANY switch failure, add the chain via the raw
+  // provider request, then switch again.
+  try{ await window.ethereum.request({method:"wallet_switchEthereumChain", params:[{chainId:hexId}]}); }
+  catch(switchErr){
+    await window.ethereum.request({method:"wallet_addEthereumChain", params:addParams});
+    await window.ethereum.request({method:"wallet_switchEthereumChain", params:[{chainId:hexId}]});
+  }
   signer = await provider.getSigner(); account = await signer.getAddress();
   $("connectBtn").textContent = t("connected")+": "+account.slice(0,6)+"…"+account.slice(-4);
   refreshDeployedUI(); refreshBalances(); quoteSwap(); refreshLp();
