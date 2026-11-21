@@ -24,3 +24,23 @@ then add liquidity via Router02.addLiquidity / the site's Pool tab.
 Next on Teh Fund's side (per his 2026-11-21 post): create the Q
 stablecoin on Qom chain, make a pool against QOMX (or another pair) on
 this Factory, and bridge there.
+
+## Update 2026-11-21 (evening) — official QOMX ERC-20 adopted
+Teh Fund asked that the DEX use the official QOMX contract instead of WQOMX:
+0xD4949664cD82660AaE99bEdc034a0deA8A0bd517 — verified on-chain as the ERC-20
+mirror of native QOMX (balanceOf == native balance on every probed address;
+totalSupply == 200M genesis supply). The frontend now lists it as the main
+"QOMX" token (labelled "official ERC-20"). NOTHING was changed on-chain:
+Factory / Router02 / WQOMX stay deployed and supported exactly as before, and
+any WQOMX pool keeps working — the switch is display/default only, so no
+holder can lose funds by it. Teh Fund's Q/QOMX pair is created with
+Factory.createPair(Q, 0xD4949664cD82660AaE99bEdc034a0deA8A0bd517).
+
+Follow-up reply draft for Teh Fund:
+"Thanks — confirmed on-chain: 0xD494…0517 is the official ERC-20 mirror of
+native QOMX (balanceOf equals the native balance). The DEX frontend now uses
+it as the main QOMX. WQOMX stays deployed and supported, and nothing was
+moved or changed on-chain, so the Q/QOMX pair can be created anytime with
+Factory.createPair(Q, 0xD4949664cD82660AaE99bEdc034a0deA8A0bd517).
+About the swap not opening in your MetaMask — was that on mobile or desktop,
+and what did you see? I want to fix that first."
