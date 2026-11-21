@@ -30,7 +30,6 @@
     <button class="tab active" data-tab="swap" data-i18n="tabSwap">Swap</button>
     <button class="tab" data-tab="pool" data-i18n="tabPool">Pool</button>
     <button class="tab" data-tab="wrap" data-i18n="tabWrap">Wrap</button>
-    <button class="tab" data-tab="deploy" data-i18n="tabDeploy">Deploy</button>
   </nav>
 
   <!-- SWAP -->
@@ -100,21 +99,6 @@
     <p class="status" id="wrapStatus"></p>
   </section>
 
-  <!-- DEPLOY -->
-  <section id="tab-deploy" class="card" hidden>
-    <h2 data-i18n="deployTitle">Deploy the DEX (one time)</h2>
-    <p class="muted" data-i18n="deployNote">Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.</p>
-    <ol class="steps">
-      <li><button id="depW" class="btn primary" disabled>1. Deploy WQOMX</button> <span id="depWAddr" class="addr"></span></li>
-      <li><button id="depF" class="btn primary" disabled>2. Deploy Factory</button> <span id="depFAddr" class="addr"></span></li>
-      <li><button id="depR" class="btn primary" disabled>3. Deploy Router02</button> <span id="depRAddr" class="addr"></span></li>
-    </ol>
-    <p class="status" id="depStatus"></p>
-    <h3 data-i18n="handoffTitle">Addresses for Teh Fund / pool creators</h3>
-    <pre id="handoff" class="handoff">—</pre>
-    <button id="copyHandoff" class="btn small" data-i18n="copyBtn">Copy</button>
-  </section>
-
   <!-- Token picker -->
   <dialog id="tokDlg">
     <h3 data-i18n="pickToken">Pick a token</h3>
@@ -132,7 +116,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
 <script src="config.js"></script>
-<script src="deploy-artifacts.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -9,8 +9,8 @@ const PAIR_ABI = ["function getReserves() view returns (uint112,uint112,uint32)"
 const WQOMX_ABI = ["function deposit() payable","function withdraw(uint256)","function balanceOf(address) view returns (uint256)"];
 
 const I18N = {
-  en:{tabSwap:"Swap",tabPool:"Pool",tabWrap:"Wrap",tabDeploy:"Deploy",youPay:"You pay",youReceive:"You receive (estimated)",slippage:"Slippage %",connect:"Connect Wallet",connected:"Connected",wrongNet:"Wrong network — click Connect to switch to Qom (33303).",notDeployed:"The DEX contracts are not deployed yet. Open the Deploy tab — deployment takes 3 signatures from your own wallet, then swap/pool open automatically in this browser.",pickToken:"Pick a token",importBtn:"Import",addLiq:"Add liquidity",removeLiq:"Remove liquidity",pairLabel:"Pair (Token A / Token B above)",wrapNote:"QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.",wrapBtn:"Wrap",unwrapBtn:"Unwrap",deployTitle:"Deploy the DEX (one time)",deployNote:"Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.",handoffTitle:"Addresses for Teh Fund / pool creators",copyBtn:"Copy",noPool:"No pool / no liquidity for this pair yet — quote unavailable. Create it in the Pool tab.",quoteOk:(r)=>`Rate ≈ ${r}`,needConnect:"Connect your wallet first.",needDeployed:"Contracts not deployed yet — see the Deploy tab.",working:"Working… check your wallet.",done:(h)=>`Done ✓ tx: ${h}`,failed:(m)=>`Failed: ${m}`,bal:(b,s)=>`Balance: ${b} ${s}`,lpBal:(b)=>`Your LP balance: ${b}`,insufficient:"Amount exceeds your balance / allowance flow failed."},
-  ja:{tabSwap:"スワップ",tabPool:"プール",tabWrap:"ラップ",tabDeploy:"デプロイ",youPay:"支払う",youReceive:"受け取る（見込み）",slippage:"スリッページ %",connect:"ウォレット接続",connected:"接続済み",wrongNet:"ネットワークが違います —「ウォレット接続」から Qom (33303) に切り替えてください。",notDeployed:"DEXコントラクトはまだデプロイされていません。「デプロイ」タブを開いてください — 自分のウォレットで3回署名するだけでデプロイでき、このブラウザではスワップ/プールが自動で有効になります。",pickToken:"トークンを選ぶ",importBtn:"追加",addLiq:"流動性を追加",removeLiq:"流動性を削除",pairLabel:"ペア（上の Token A / Token B）",wrapNote:"QOMX ⇄ WQOMX は常に 1:1。WQOMX は DEX で使う QOMX の ERC-20 版です。",wrapBtn:"ラップ",unwrapBtn:"アンラップ",deployTitle:"DEXをデプロイ（初回のみ）",deployNote:"あなたのウォレットから WQOMX → Factory → Router02 の順にデプロイします。各ステップであなたが署名し、鍵は誰にも渡りません。feeTo は未設定（プロトコル手数料OFF）、feeToSetter はあなたのアドレスです。ガス見積もり合計 ≈ 850万 gas — 現在のガス価格では約460 QOMX になるため、デプロイ用ウォレットには 600 QOMX 以上を用意してください。",handoffTitle:"Teh Fund / プール作成者向けアドレス一覧",copyBtn:"コピー",noPool:"このペアのプール／流動性がまだ無いため見積もりできません。「プール」タブで作成できます。",quoteOk:(r)=>`レート ≈ ${r}`,needConnect:"先にウォレットを接続してください。",needDeployed:"コントラクト未デプロイです —「デプロイ」タブを見てください。",working:"処理中… ウォレットを確認してください。",done:(h)=>`完了 ✓ tx: ${h}`,failed:(m)=>`失敗: ${m}`,bal:(b,s)=>`残高: ${b} ${s}`,lpBal:(b)=>`あなたのLP残高: ${b}`,insufficient:"残高不足、または承認フローに失敗しました。"}
+  en:{tabSwap:"Swap",tabPool:"Pool",tabWrap:"Wrap",tabDeploy:"Deploy",youPay:"You pay",youReceive:"You receive (estimated)",slippage:"Slippage %",connect:"Connect Wallet",connected:"Connected",wrongNet:"Wrong network — click Connect to switch to Qom (33303).",notDeployed:"The DEX contracts are not configured in this build.",pickToken:"Pick a token",importBtn:"Import",addLiq:"Add liquidity",removeLiq:"Remove liquidity",pairLabel:"Pair (Token A / Token B above)",wrapNote:"QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.",wrapBtn:"Wrap",unwrapBtn:"Unwrap",deployTitle:"Deploy the DEX (one time)",deployNote:"Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.",handoffTitle:"Addresses for Teh Fund / pool creators",copyBtn:"Copy",noPool:"No pool / no liquidity for this pair yet — quote unavailable. Create it in the Pool tab.",quoteOk:(r)=>`Rate ≈ ${r}`,needConnect:"Connect your wallet first.",needDeployed:"Contracts not configured in this build.",working:"Working… check your wallet.",done:(h)=>`Done ✓ tx: ${h}`,failed:(m)=>`Failed: ${m}`,bal:(b,s)=>`Balance: ${b} ${s}`,lpBal:(b)=>`Your LP balance: ${b}`,insufficient:"Amount exceeds your balance / allowance flow failed."},
+  ja:{tabSwap:"スワップ",tabPool:"プール",tabWrap:"ラップ",tabDeploy:"デプロイ",youPay:"支払う",youReceive:"受け取る（見込み）",slippage:"スリッページ %",connect:"ウォレット接続",connected:"接続済み",wrongNet:"ネットワークが違います —「ウォレット接続」から Qom (33303) に切り替えてください。",notDeployed:"DEXコントラクトがこのビルドに設定されていません。",pickToken:"トークンを選ぶ",importBtn:"追加",addLiq:"流動性を追加",removeLiq:"流動性を削除",pairLabel:"ペア（上の Token A / Token B）",wrapNote:"QOMX ⇄ WQOMX は常に 1:1。WQOMX は DEX で使う QOMX の ERC-20 版です。",wrapBtn:"ラップ",unwrapBtn:"アンラップ",deployTitle:"DEXをデプロイ（初回のみ）",deployNote:"あなたのウォレットから WQOMX → Factory → Router02 の順にデプロイします。各ステップであなたが署名し、鍵は誰にも渡りません。feeTo は未設定（プロトコル手数料OFF）、feeToSetter はあなたのアドレスです。ガス見積もり合計 ≈ 850万 gas — 現在のガス価格では約460 QOMX になるため、デプロイ用ウォレットには 600 QOMX 以上を用意してください。",handoffTitle:"Teh Fund / プール作成者向けアドレス一覧",copyBtn:"コピー",noPool:"このペアのプール／流動性がまだ無いため見積もりできません。「プール」タブで作成できます。",quoteOk:(r)=>`レート ≈ ${r}`,needConnect:"先にウォレットを接続してください。",needDeployed:"コントラクトがこのビルドに設定されていません。",working:"処理中… ウォレットを確認してください。",done:(h)=>`完了 ✓ tx: ${h}`,failed:(m)=>`失敗: ${m}`,bal:(b,s)=>`残高: ${b} ${s}`,lpBal:(b)=>`あなたのLP残高: ${b}`,insufficient:"残高不足、または承認フローに失敗しました。"}
 };
 let lang = localStorage.getItem("qomdex-lang") || "en";
 const t = k => I18N[lang][k];
@@ -39,7 +39,7 @@ function minOut(amount, slipPct){ const bps = BigInt(Math.round((100 - Number(sl
 
 async function init(){
   readProvider = new ethers.JsonRpcProvider(CFG.rpcUrl, CFG.chainId);
-  applyLang(); refreshDeployedUI(); renderTokButtons(); updateHandoff();
+  applyLang(); refreshDeployedUI(); renderTokButtons();
   try{ const n = await readProvider.getNetwork(); console.log("RPC chain", n.chainId.toString()); }catch(e){ $("netNotice").hidden=false; $("netNotice").textContent = "RPC unreachable: "+CFG.rpcUrl; }
   if(window.ethereum){ provider = new ethers.BrowserProvider(window.ethereum); window.ethereum.on?.("accountsChanged", ()=>location.reload()); window.ethereum.on?.("chainChanged", ()=>location.reload()); }
 }
@@ -48,12 +48,7 @@ function refreshDeployedUI(){
   if(!deployed()) $("notDeployed").textContent = t("notDeployed");
   const dis = !deployed();
   $("swapBtn").disabled = dis; $("liqBtn").disabled = dis; $("liqRemoveBtn").disabled = dis; $("wrapBtn").disabled = dis || !addrs.wqomx; $("unwrapBtn").disabled = dis || !addrs.wqomx;
-  if(addrs.wqomx && !$("depWAddr").textContent) $("depWAddr").textContent = addrs.wqomx;
-  if(addrs.factory && !$("depFAddr").textContent) $("depFAddr").textContent = addrs.factory;
-  if(addrs.router && !$("depRAddr").textContent) $("depRAddr").textContent = addrs.router;
-  $("depW").disabled = !account; $("depF").disabled = !account || !addrs.wqomx; $("depR").disabled = !account || !addrs.factory || !addrs.wqomx;
-  const tl = tokenList(); if(!tl.some(x=>x.address===swapOut.address)) { swapOut = tl[1]||tl[0]; liqB = swapOut; }
-  renderTokButtons(); updateHandoff();
+  renderTokButtons();
 }
 function applyLang(){
   document.querySelectorAll("[data-i18n]").forEach(el=>{ const k=el.dataset.i18n; if(I18N[lang][k]) el.textContent = I18N[lang][k]; });
@@ -64,7 +59,7 @@ function applyLang(){
 $("langBtn").onclick = ()=>{ lang = lang==="en"?"ja":"en"; localStorage.setItem("qomdex-lang", lang); applyLang(); };
 $("themeBtn").onclick = ()=>{ const d = document.documentElement.dataset.theme==="dark"; document.documentElement.dataset.theme = d?"":"dark"; localStorage.setItem("guppy-theme", d?"light":"dark"); $("themeBtn").textContent = d?"🌙 Dark":"☀️ Light"; };
 
-document.querySelectorAll(".tab").forEach(b=> b.onclick = ()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); b.classList.add("active"); ["swap","pool","wrap","deploy"].forEach(k=> $("tab-"+k).hidden = k!==b.dataset.tab); });
+document.querySelectorAll(".tab").forEach(b=> b.onclick = ()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); b.classList.add("active"); ["swap","pool","wrap"].forEach(k=> $("tab-"+k).hidden = k!==b.dataset.tab); });
 
 async function connect(){
   if(!window.ethereum){ alert("MetaMask not found."); return; }
@@ -190,21 +185,4 @@ $("liqRemoveBtn").onclick = doRemoveLiq;
 $("wrapBtn").onclick = async ()=>{ const st=$("wrapStatus"); try{ st.textContent=t("working"); const w=new ethers.Contract(addrs.wqomx, WQOMX_ABI, signer); const tx=await w.deposit({value: ethers.parseEther($("wrapAmt").value)}); const r=await tx.wait(); st.textContent=t("done")(r.hash); }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); } };
 $("unwrapBtn").onclick = async ()=>{ const st=$("wrapStatus"); try{ st.textContent=t("working"); const w=new ethers.Contract(addrs.wqomx, WQOMX_ABI, signer); const tx=await w.withdraw(ethers.parseEther($("unwrapAmt").value)); const r=await tx.wait(); st.textContent=t("done")(r.hash); }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); } };
 
-async function deployStep(kind){
-  const st=$("depStatus"); const A=window.DEPLOY_ARTIFACTS;
-  try{
-    st.textContent=t("working");
-    let f, c;
-    if(kind==="W"){ f=new ethers.ContractFactory(A.WQOMX.abi, A.WQOMX.bytecode, signer); c=await f.deploy(); await c.waitForDeployment(); addrs.wqomx=await c.getAddress(); $("depWAddr").textContent=addrs.wqomx; }
-    if(kind==="F"){ f=new ethers.ContractFactory(A.Factory.abi, A.Factory.bytecode, signer); c=await f.deploy(account); await c.waitForDeployment(); addrs.factory=await c.getAddress(); $("depFAddr").textContent=addrs.factory; }
-    if(kind==="R"){ f=new ethers.ContractFactory(A.Router02.abi, A.Router02.bytecode, signer); c=await f.deploy(addrs.factory, addrs.wqomx); await c.waitForDeployment(); addrs.router=await c.getAddress(); $("depRAddr").textContent=addrs.router; }
-    saveAddrs(); st.textContent=t("done")(c.deploymentTransaction()?.hash||"");
-  }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); }
-}
-$("depW").onclick=()=>deployStep("W"); $("depF").onclick=()=>deployStep("F"); $("depR").onclick=()=>deployStep("R");
-function updateHandoff(){
-  if(!deployed()){ $("handoff").textContent="—"; return; }
-  $("handoff").textContent = `Qom DEX (Uniswap V2) — Qom chain\nChain ID: 33303 (Cosmos: qom_33303-1)\nRPC: ${CFG.rpcUrl}\nExplorer: ${CFG.explorer}\nWQOMX: ${addrs.wqomx}\nFactory: ${addrs.factory}\nRouter02: ${addrs.router}\nSwap fee: 0.3% · feeTo: unset (protocol fee OFF)\nCreate a pool: Factory.createPair(token, WQOMX) or use the Pool tab.\nVerify on scan.qomx.io — sources in the GitHub repo (contracts/).`;
-}
-$("copyHandoff").onclick=()=>navigator.clipboard?.writeText($("handoff").textContent);
 init();
