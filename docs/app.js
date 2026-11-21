@@ -4,13 +4,13 @@ const CFG = window.DEX_CONFIG;
 const $ = id => document.getElementById(id);
 const ERC20_ABI = ["function symbol() view returns (string)","function decimals() view returns (uint8)","function balanceOf(address) view returns (uint256)","function allowance(address,address) view returns (uint256)","function approve(address,uint256) returns (bool)","function transfer(address,uint256) returns (bool)"];
 const ROUTER_ABI = ["function getAmountsOut(uint256,address[]) view returns (uint256[])","function swapExactETHForTokens(uint256,address[],address,uint256) payable returns (uint256[])","function swapExactTokensForETH(uint256,uint256,address[],address,uint256) returns (uint256[])","function swapExactTokensForTokens(uint256,uint256,address[],address,uint256) returns (uint256[])","function addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256) returns (uint256,uint256,uint256)","function addLiquidityETH(address,uint256,uint256,uint256,address,uint256) payable returns (uint256,uint256,uint256)","function removeLiquidity(address,address,uint256,uint256,uint256,address,uint256) returns (uint256,uint256)","function removeLiquidityETH(address,uint256,uint256,uint256,address,uint256) returns (uint256,uint256)","function factory() view returns (address)","function WETH() view returns (address)"];
-const FACTORY_ABI = ["function getPair(address,address) view returns (address)","function feeTo() view returns (address)","function feeToSetter() view returns (address)"];
+const FACTORY_ABI = ["function getPair(address,address) view returns (address)","function feeTo() view returns (address)","function feeToSetter() view returns (address)","function allPairsLength() view returns (uint256)","function allPairs(uint256) view returns (address)"];
 const PAIR_ABI = ["function getReserves() view returns (uint112,uint112,uint32)","function balanceOf(address) view returns (uint256)","function allowance(address,address) view returns (uint256)","function approve(address,uint256) returns (bool)","function totalSupply() view returns (uint256)","function token0() view returns (address)","function token1() view returns (address)"];
 const WQOMX_ABI = ["function deposit() payable","function withdraw(uint256)","function balanceOf(address) view returns (uint256)"];
 
 const I18N = {
-  en:{tabSwap:"Swap",tabPool:"Pool",tabWrap:"Wrap",tabDeploy:"Deploy",youPay:"You pay",youReceive:"You receive (estimated)",slippage:"Slippage %",connect:"Connect Wallet",connected:"Connected",wrongNet:"Wrong network — click Connect to switch to Qom (33303).",notDeployed:"The DEX contracts are not configured in this build.",pickToken:"Pick a token",importBtn:"Import",addLiq:"Add liquidity",removeLiq:"Remove liquidity",pairLabel:"Pair (Token A / Token B above)",wrapNote:"QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.",wrapBtn:"Wrap",unwrapBtn:"Unwrap",deployTitle:"Deploy the DEX (one time)",deployNote:"Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.",handoffTitle:"Addresses for Teh Fund / pool creators",copyBtn:"Copy",noPool:"No pool / no liquidity for this pair yet — quote unavailable. Create it in the Pool tab.",quoteOk:(r)=>`Rate ≈ ${r}`,needConnect:"Connect your wallet first.",needDeployed:"Contracts not configured in this build.",working:"Working… check your wallet.",done:(h)=>`Done ✓ tx: ${h}`,failed:(m)=>`Failed: ${m}`,bal:(b,s)=>`Balance: ${b} ${s}`,lpBal:(b)=>`Your LP balance: ${b}`,insufficient:"Amount exceeds your balance / allowance flow failed.",useWrap:"QOMX ⇄ WQOMX is 1:1 — use the Wrap tab, not Swap.",samePair:"Pick two different tokens for a pair.",tag_official:"official ERC-20",tag_wrapped:"wrapped",tag_native:"via WQOMX",qomxNote:"QOMX in the list is the official ERC-20 contract (0xD494…0517): its balance IS your native QOMX balance — the same coins, spendable directly. WQOMX is a separate wrapped token; WQOMX pools keep working exactly as before. Nothing was moved or changed on-chain."},
-  ja:{tabSwap:"スワップ",tabPool:"プール",tabWrap:"ラップ",tabDeploy:"デプロイ",youPay:"支払う",youReceive:"受け取る（見込み）",slippage:"スリッページ %",connect:"ウォレット接続",connected:"接続済み",wrongNet:"ネットワークが違います —「ウォレット接続」から Qom (33303) に切り替えてください。",notDeployed:"DEXコントラクトがこのビルドに設定されていません。",pickToken:"トークンを選ぶ",importBtn:"追加",addLiq:"流動性を追加",removeLiq:"流動性を削除",pairLabel:"ペア（上の Token A / Token B）",wrapNote:"QOMX ⇄ WQOMX は常に 1:1。WQOMX は DEX で使う QOMX の ERC-20 版です。",wrapBtn:"ラップ",unwrapBtn:"アンラップ",deployTitle:"DEXをデプロイ（初回のみ）",deployNote:"あなたのウォレットから WQOMX → Factory → Router02 の順にデプロイします。各ステップであなたが署名し、鍵は誰にも渡りません。feeTo は未設定（プロトコル手数料OFF）、feeToSetter はあなたのアドレスです。ガス見積もり合計 ≈ 850万 gas — 現在のガス価格では約460 QOMX になるため、デプロイ用ウォレットには 600 QOMX 以上を用意してください。",handoffTitle:"Teh Fund / プール作成者向けアドレス一覧",copyBtn:"コピー",noPool:"このペアのプール／流動性がまだ無いため見積もりできません。「プール」タブで作成できます。",quoteOk:(r)=>`レート ≈ ${r}`,needConnect:"先にウォレットを接続してください。",needDeployed:"コントラクトがこのビルドに設定されていません。",working:"処理中… ウォレットを確認してください。",done:(h)=>`完了 ✓ tx: ${h}`,failed:(m)=>`失敗: ${m}`,bal:(b,s)=>`残高: ${b} ${s}`,lpBal:(b)=>`あなたのLP残高: ${b}`,insufficient:"残高不足、または承認フローに失敗しました。",useWrap:"QOMX ⇄ WQOMX は 1:1 です — スワップではなく「ラップ」タブを使ってください。",samePair:"ペアには異なる2つのトークンを選んでください。",tag_official:"公式 ERC-20",tag_wrapped:"ラップ済み",tag_native:"WQOMX 経由",qomxNote:"リストの QOMX は公式 ERC-20 コントラクト（0xD494…0517）です。残高はネイティブ QOMX の残高そのもの（同じコイン）で、そのまま使えます。WQOMX は別のラップ済みトークンで、WQOMX のプールは今まで通り動き続けます。チェーン上のものは何も移動・変更していません。"}
+  en:{tabSwap:"Swap",tabPool:"Pool",tabWrap:"Wrap",tabDeploy:"Deploy",youPay:"You pay",youReceive:"You receive (estimated)",slippage:"Slippage %",connect:"Connect Wallet",connected:"Connected",wrongNet:"Wrong network — click Connect to switch to Qom (33303).",notDeployed:"The DEX contracts are not configured in this build.",pickToken:"Pick a token",importBtn:"Import",addLiq:"Add liquidity",removeLiq:"Remove liquidity",pairLabel:"Pair (Token A / Token B above)",wrapNote:"QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.",wrapBtn:"Wrap",unwrapBtn:"Unwrap",deployTitle:"Deploy the DEX (one time)",deployNote:"Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.",handoffTitle:"Addresses for Teh Fund / pool creators",copyBtn:"Copy",noPool:"No pool / no liquidity for this pair yet — quote unavailable. Create it in the Pool tab.",quoteOk:(r)=>`Rate ≈ ${r}`,needConnect:"Connect your wallet first.",needDeployed:"Contracts not configured in this build.",working:"Working… check your wallet.",done:(h)=>`Done ✓ tx: ${h}`,failed:(m)=>`Failed: ${m}`,bal:(b,s)=>`Balance: ${b} ${s}`,lpBal:(b)=>`Your LP balance: ${b}`,insufficient:"Amount exceeds your balance / allowance flow failed.",useWrap:"QOMX ⇄ WQOMX is 1:1 — use the Wrap tab, not Swap.",samePair:"Pick two different tokens for a pair.",tag_official:"official ERC-20",poolsTitle:"Pools on this DEX",poolsNone:"No pools yet — create the first one above.",openInMM:"Open this page in MetaMask",noWallet:"No wallet found in this browser. Open this page inside MetaMask (or install MetaMask), then tap Connect Wallet.",tag_wrapped:"wrapped",tag_native:"via WQOMX",qomxNote:"QOMX in the list is the official ERC-20 contract (0xD494…0517): its balance IS your native QOMX balance — the same coins, spendable directly. WQOMX is a separate wrapped token; WQOMX pools keep working exactly as before. Nothing was moved or changed on-chain."},
+  ja:{tabSwap:"スワップ",tabPool:"プール",tabWrap:"ラップ",tabDeploy:"デプロイ",youPay:"支払う",youReceive:"受け取る（見込み）",slippage:"スリッページ %",connect:"ウォレット接続",connected:"接続済み",wrongNet:"ネットワークが違います —「ウォレット接続」から Qom (33303) に切り替えてください。",notDeployed:"DEXコントラクトがこのビルドに設定されていません。",pickToken:"トークンを選ぶ",importBtn:"追加",addLiq:"流動性を追加",removeLiq:"流動性を削除",pairLabel:"ペア（上の Token A / Token B）",wrapNote:"QOMX ⇄ WQOMX は常に 1:1。WQOMX は DEX で使う QOMX の ERC-20 版です。",wrapBtn:"ラップ",unwrapBtn:"アンラップ",deployTitle:"DEXをデプロイ（初回のみ）",deployNote:"あなたのウォレットから WQOMX → Factory → Router02 の順にデプロイします。各ステップであなたが署名し、鍵は誰にも渡りません。feeTo は未設定（プロトコル手数料OFF）、feeToSetter はあなたのアドレスです。ガス見積もり合計 ≈ 850万 gas — 現在のガス価格では約460 QOMX になるため、デプロイ用ウォレットには 600 QOMX 以上を用意してください。",handoffTitle:"Teh Fund / プール作成者向けアドレス一覧",copyBtn:"コピー",noPool:"このペアのプール／流動性がまだ無いため見積もりできません。「プール」タブで作成できます。",quoteOk:(r)=>`レート ≈ ${r}`,needConnect:"先にウォレットを接続してください。",needDeployed:"コントラクトがこのビルドに設定されていません。",working:"処理中… ウォレットを確認してください。",done:(h)=>`完了 ✓ tx: ${h}`,failed:(m)=>`失敗: ${m}`,bal:(b,s)=>`残高: ${b} ${s}`,lpBal:(b)=>`あなたのLP残高: ${b}`,insufficient:"残高不足、または承認フローに失敗しました。",useWrap:"QOMX ⇄ WQOMX は 1:1 です — スワップではなく「ラップ」タブを使ってください。",samePair:"ペアには異なる2つのトークンを選んでください。",tag_official:"公式 ERC-20",poolsTitle:"このDEXのプール",poolsNone:"プールはまだありません — 上で最初のプールを作れます。",openInMM:"MetaMaskでこのページを開く",noWallet:"このブラウザにウォレットが見つかりません。MetaMaskの中でこのページを開く（またはMetaMaskを入れる）→「ウォレット接続」を押してください。",tag_wrapped:"ラップ済み",tag_native:"WQOMX 経由",qomxNote:"リストの QOMX は公式 ERC-20 コントラクト（0xD494…0517）です。残高はネイティブ QOMX の残高そのもの（同じコイン）で、そのまま使えます。WQOMX は別のラップ済みトークンで、WQOMX のプールは今まで通り動き続けます。チェーン上のものは何も移動・変更していません。"}
 };
 let lang = localStorage.getItem("qomdex-lang") || "en";
 const t = k => I18N[lang][k];
@@ -43,7 +43,11 @@ async function init(){
   readProvider = new ethers.JsonRpcProvider(CFG.rpcUrl, CFG.chainId);
   applyLang(); refreshDeployedUI(); renderTokButtons();
   try{ const n = await readProvider.getNetwork(); console.log("RPC chain", n.chainId.toString()); }catch(e){ $("netNotice").hidden=false; $("netNotice").textContent = "RPC unreachable: "+CFG.rpcUrl; }
-  if(window.ethereum){ provider = new ethers.BrowserProvider(window.ethereum); window.ethereum.on?.("accountsChanged", ()=>location.reload()); window.ethereum.on?.("chainChanged", ()=>location.reload()); }
+  const wireEth = ()=>{ if(window.ethereum && !provider){ provider = new ethers.BrowserProvider(window.ethereum); window.ethereum.on?.("accountsChanged", ()=>location.reload()); window.ethereum.on?.("chainChanged", ()=>location.reload()); $("mmOpen").hidden = true; } };
+  wireEth();
+  window.addEventListener("ethereum#initialized", wireEth, {once:true});
+  setTimeout(()=>{ if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); $("mmOpen").hidden = false; } }, 1200);
+  loadPools();
 }
 function refreshDeployedUI(){
   $("notDeployed").hidden = deployed();
@@ -64,7 +68,7 @@ $("themeBtn").onclick = ()=>{ const d = document.documentElement.dataset.theme==
 document.querySelectorAll(".tab").forEach(b=> b.onclick = ()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); b.classList.add("active"); ["swap","pool","wrap"].forEach(k=> $("tab-"+k).hidden = k!==b.dataset.tab); });
 
 async function connect(){
-  if(!window.ethereum){ alert("MetaMask not found."); return; }
+  if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); $("mmOpen").hidden = false; return; }
   provider = new ethers.BrowserProvider(window.ethereum);
   const hexId = "0x"+CFG.chainId.toString(16);
   const addParams = [{chainId:hexId, chainName:CFG.chainName, nativeCurrency:{name:"QOMX",symbol:"QOMX",decimals:18}, rpcUrls:[CFG.rpcUrl], blockExplorerUrls:[CFG.explorer]}];
@@ -143,6 +147,27 @@ async function doSwap(){
     const r = await tx.wait(); st.textContent = t("done")(r.hash); refreshBalances(); quoteSwap();
   }catch(e){ st.textContent = t("failed")(e.shortMessage||e.message); }
 }
+
+async function loadPools(){
+  const el = $("poolList"); if(!el || !deployed()) return;
+  try{
+    const f = new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider);
+    const n = Number(await f.allPairsLength());
+    if(n===0){ el.innerHTML = ""; const p=document.createElement("p"); p.className="muted"; p.textContent = t("poolsNone"); el.appendChild(p); return; }
+    el.innerHTML = "";
+    for(let i=0;i<n;i++){
+      const pair = await f.allPairs(i);
+      const pc = new ethers.Contract(pair, PAIR_ABI, readProvider);
+      const [t0, t1, r] = await Promise.all([pc.token0(), pc.token1(), pc.getReserves()]);
+      const sym = async a => { try{ return await new ethers.Contract(a, ERC20_ABI, readProvider).symbol(); }catch(e){ return a.slice(0,6)+"…"; } };
+      const [s0, s1] = await Promise.all([sym(t0), sym(t1)]);
+      const row = document.createElement("div"); row.className = "pool-row";
+      const a = document.createElement("a"); a.href = CFG.explorer + "/address/" + pair; a.target = "_blank"; a.rel = "noopener"; a.textContent = s0 + " / " + s1;
+      const span = document.createElement("span"); span.textContent = fmt(ethers.formatEther(r[0])) + " " + s0 + " · " + fmt(ethers.formatEther(r[1])) + " " + s1;
+      row.appendChild(a); row.appendChild(span); el.appendChild(row);
+    }
+  }catch(e){ /* leave as-is */ }
+}
 $("swapBtn").onclick = doSwap;
 
 async function refreshLp(){
@@ -183,7 +208,7 @@ async function doRemoveLiq(){
     const router=new ethers.Contract(addrs.router, ROUTER_ABI, signer); let tx;
     if(liqA.address==="native"||liqB.address==="native"){ const tok=liqA.address==="native"?liqB:liqA; tx=await router.removeLiquidityETH(tok.address, amt, 0, 0, account, deadline()); }
     else tx=await router.removeLiquidity(liqA.address, liqB.address, amt, 0, 0, account, deadline());
-    const r=await tx.wait(); st.textContent=t("done")(r.hash); refreshLp();
+    const r=await tx.wait(); st.textContent=t("done")(r.hash); refreshLp(); loadPools();
   }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); }
 }
 $("liqRemoveBtn").onclick = doRemoveLiq;

@@ -8,12 +8,15 @@
 <script>try{if(localStorage.getItem('guppy-theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/jpeg" href="logo.jpg">
+<meta property="og:title" content="Qom DEX — Swap on Qom Chain (33303)">
+<meta property="og:image" content="logo.jpg">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
   <div class="wrap head-in">
-    <div class="brand">🦎 Qom DEX <span class="tag">Qom Chain · 33303</span></div>
+    <div class="brand"><img class="brand-logo" src="logo.jpg" alt="Qom"> Qom DEX <span class="tag">Qom Chain · 33303</span></div>
     <div class="head-btns">
       <button id="langBtn" class="chip-btn">日本語</button>
       <button id="themeBtn" class="chip-btn">🌙 Dark</button>
@@ -25,6 +28,7 @@
 <main class="wrap">
   <p id="notDeployed" class="notice" hidden></p>
   <p id="netNotice" class="notice warn" hidden></p>
+  <p id="mmOpen" class="notice" hidden><a id="mmOpenLink" href="https://metamask.app.link/dapp/ql1-infinite42-guppy-histoire.github.io/qom-dex/" target="_blank" rel="noopener" data-i18n="openInMM">Open in MetaMask</a></p>
 
   <nav class="tabs">
     <button class="tab active" data-tab="swap" data-i18n="tabSwap">Swap</button>
@@ -85,6 +89,9 @@
     </div>
     <button id="liqRemoveBtn" class="btn danger big" disabled data-i18n="removeLiq">Remove liquidity</button>
     <p class="status" id="liqRemoveStatus"></p>
+
+    <h2 data-i18n="poolsTitle">Pools</h2>
+    <div id="poolList" class="pool-list"><p class="muted">…</p></div>
   </section>
 
   <!-- WRAP -->
@@ -112,6 +119,12 @@
   <footer>
     <p class="muted" id="footNote">Community-built, unaudited Uniswap V2 fork. Verify contracts on <a href="https://scan.qomx.io" target="_blank" rel="noopener">scan.qomx.io</a>. Swap fee 0.3%. DYOR — liquidity on a new chain is thin and prices can move hard.</p>
     <p class="muted">RPC: https://rpc.qomx.io · Chain ID: 33303 · Native: QOMX</p>
+    <p class="muted">Contracts:
+      <a href="https://scan.qomx.io/address/0x1cC5CeEaF98A3b4e2BB2731f960D63CBe0BA8BFC" target="_blank" rel="noopener">Factory</a> ·
+      <a href="https://scan.qomx.io/address/0xD0199c4EA87e4CfCc221f2efBC9f161a1331B1F4" target="_blank" rel="noopener">Router</a> ·
+      <a href="https://scan.qomx.io/address/0x7DF7DDe45772E01e99aB05F1977E926516271897" target="_blank" rel="noopener">WQOMX</a> ·
+      <a href="https://scan.qomx.io/address/0xD4949664cD82660AaE99bEdc034a0deA8A0bd517" target="_blank" rel="noopener">QOMX (official)</a>
+    </p>
   </footer>
 </main>
 
