@@ -29,7 +29,6 @@ function tokenList(){
   const list = [];
   if(CFG.qomxErc20) list.push({symbol:"QOMX", address:CFG.qomxErc20, decimals:18, tag:"official"});
   if(addrs.wqomx) list.push({symbol:"WQOMX", address:addrs.wqomx, decimals:18, tag:"wrapped"});
-  list.push({symbol:"QOMX (native)", address:"native", decimals:18, tag:"native"});
   return list.concat(customTokens.filter(ct => !list.some(x=>x.address.toLowerCase()===ct.address.toLowerCase())));
 }
 let swapIn = tokenList()[0], swapOut = tokenList()[1] || tokenList()[0];
