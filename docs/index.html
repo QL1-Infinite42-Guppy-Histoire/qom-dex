@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qom DEX — Swap on Qom Chain (33303)</title>
+<meta name="description" content="A normal Uniswap V2-style DEX for the Qom chain (EVM 33303, QOMX). Swap and provide liquidity from your own wallet.">
+<script>try{if(localStorage.getItem('guppy-theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="wrap head-in">
+    <div class="brand">🦎 Qom DEX <span class="tag">Qom Chain · 33303</span></div>
+    <div class="head-btns">
+      <button id="langBtn" class="chip-btn">日本語</button>
+      <button id="themeBtn" class="chip-btn">🌙 Dark</button>
+      <button id="connectBtn" class="btn primary small">Connect Wallet</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <p id="notDeployed" class="notice" hidden></p>
+  <p id="netNotice" class="notice warn" hidden></p>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="swap" data-i18n="tabSwap">Swap</button>
+    <button class="tab" data-tab="pool" data-i18n="tabPool">Pool</button>
+    <button class="tab" data-tab="wrap" data-i18n="tabWrap">Wrap</button>
+    <button class="tab" data-tab="deploy" data-i18n="tabDeploy">Deploy</button>
+  </nav>
+
+  <!-- SWAP -->
+  <section id="tab-swap" class="card">
+    <h2 data-i18n="tabSwap">Swap</h2>
+    <div class="panel">
+      <label data-i18n="youPay">You pay</label>
+      <div class="row">
+        <input id="swapInAmt" type="number" min="0" step="any" placeholder="0.0">
+        <button id="swapInTok" class="tok-btn">QOMX ▾</button>
+      </div>
+      <div class="bal" id="swapInBal"></div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="panel">
+      <label data-i18n="youReceive">You receive (estimated)</label>
+      <div class="row">
+        <input id="swapOutAmt" type="text" readonly placeholder="0.0">
+        <button id="swapOutTok" class="tok-btn">WQOMX ▾</button>
+      </div>
+      <div class="bal" id="swapOutBal"></div>
+    </div>
+    <div class="row slim">
+      <label data-i18n="slippage">Slippage %</label>
+      <input id="slippage" type="number" value="0.5" step="0.1" min="0" class="mini">
+    </div>
+    <p class="quote" id="swapQuote"></p>
+    <button id="swapBtn" class="btn primary big" disabled>Swap</button>
+    <p class="status" id="swapStatus"></p>
+  </section>
+
+  <!-- POOL -->
+  <section id="tab-pool" class="card" hidden>
+    <h2 data-i18n="addLiq">Add liquidity</h2>
+    <div class="panel">
+      <label>Token A</label>
+      <div class="row"><input id="liqAAmt" type="number" min="0" step="any" placeholder="0.0"><button id="liqATok" class="tok-btn">QOMX ▾</button></div>
+    </div>
+    <div class="panel">
+      <label>Token B</label>
+      <div class="row"><input id="liqBAmt" type="number" min="0" step="any" placeholder="0.0"><button id="liqBTok" class="tok-btn">WQOMX ▾</button></div>
+    </div>
+    <p class="quote" id="liqQuote"></p>
+    <button id="liqBtn" class="btn primary big" disabled data-i18n="addLiq">Add liquidity</button>
+    <p class="status" id="liqStatus"></p>
+
+    <h2 data-i18n="removeLiq">Remove liquidity</h2>
+    <div class="panel">
+      <label data-i18n="pairLabel">Pair (Token A / Token B above)</label>
+      <div class="row"><input id="liqRemovePct" type="number" min="1" max="100" value="100" class="mini"><span>%</span></div>
+      <div class="bal" id="lpBal"></div>
+    </div>
+    <button id="liqRemoveBtn" class="btn danger big" disabled data-i18n="removeLiq">Remove liquidity</button>
+    <p class="status" id="liqRemoveStatus"></p>
+  </section>
+
+  <!-- WRAP -->
+  <section id="tab-wrap" class="card" hidden>
+    <h2 data-i18n="tabWrap">Wrap / Unwrap</h2>
+    <p class="muted" data-i18n="wrapNote">QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.</p>
+    <div class="panel"><label>QOMX → WQOMX</label>
+      <div class="row"><input id="wrapAmt" type="number" min="0" step="any" placeholder="0.0"><button id="wrapBtn" class="btn primary" disabled data-i18n="wrapBtn">Wrap</button></div>
+    </div>
+    <div class="panel"><label>WQOMX → QOMX</label>
+      <div class="row"><input id="unwrapAmt" type="number" min="0" step="any" placeholder="0.0"><button id="unwrapBtn" class="btn primary" disabled data-i18n="unwrapBtn">Unwrap</button></div>
+    </div>
+    <p class="status" id="wrapStatus"></p>
+  </section>
+
+  <!-- DEPLOY -->
+  <section id="tab-deploy" class="card" hidden>
+    <h2 data-i18n="deployTitle">Deploy the DEX (one time)</h2>
+    <p class="muted" data-i18n="deployNote">Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.</p>
+    <ol class="steps">
+      <li><button id="depW" class="btn primary" disabled>1. Deploy WQOMX</button> <span id="depWAddr" class="addr"></span></li>
+      <li><button id="depF" class="btn primary" disabled>2. Deploy Factory</button> <span id="depFAddr" class="addr"></span></li>
+      <li><button id="depR" class="btn primary" disabled>3. Deploy Router02</button> <span id="depRAddr" class="addr"></span></li>
+    </ol>
+    <p class="status" id="depStatus"></p>
+    <h3 data-i18n="handoffTitle">Addresses for Teh Fund / pool creators</h3>
+    <pre id="handoff" class="handoff">—</pre>
+    <button id="copyHandoff" class="btn small" data-i18n="copyBtn">Copy</button>
+  </section>
+
+  <!-- Token picker -->
+  <dialog id="tokDlg">
+    <h3 data-i18n="pickToken">Pick a token</h3>
+    <div id="tokList"></div>
+    <div class="row"><input id="customTokAddr" type="text" placeholder="0x… (ERC-20 address)"><button id="addTokBtn" class="btn small" data-i18n="importBtn">Import</button></div>
+    <p class="status" id="tokStatus"></p>
+    <button id="tokClose" class="btn small">✕</button>
+  </dialog>
+
+  <footer>
+    <p class="muted" id="footNote">Community-built, unaudited Uniswap V2 fork. Verify contracts on <a href="https://scan.qomx.io" target="_blank" rel="noopener">scan.qomx.io</a>. Swap fee 0.3%. DYOR — liquidity on a new chain is thin and prices can move hard.</p>
+    <p class="muted">RPC: https://rpc.qomx.io · Chain ID: 33303 · Native: QOMX</p>
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="config.js"></script>
+<script src="deploy-artifacts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

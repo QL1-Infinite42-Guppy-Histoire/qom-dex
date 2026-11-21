@@ -1,0 +1,10 @@
+const fs=require('fs');
+const solc=require('solc-0820');
+const src=fs.readFileSync('contracts/WQOMX.sol','utf8');
+const input={language:'Solidity',sources:{'WQOMX.sol':{content:src}},settings:{optimizer:{enabled:true,runs:999999},evmVersion:'paris',outputSelection:{'*':{'*':['abi','evm.bytecode.object']}}}};
+const out=JSON.parse(solc.compile(JSON.stringify(input)));
+if(out.errors) for(const e of out.errors) console.log(e.severity, e.formattedMessage);
+const c=out.contracts['WQOMX.sol']['WQOMX'];
+fs.mkdirSync('artifacts',{recursive:true});
+fs.writeFileSync('artifacts/WQOMX.json', JSON.stringify({contractName:'WQOMX',abi:c.abi,bytecode:'0x'+c.evm.bytecode.object},null,2));
+console.log('WQOMX bytecode bytes', c.evm.bytecode.object.length/2, 'PUSH0 opcode 0x5f present as standalone? compiled paris so no PUSH0 emission');
