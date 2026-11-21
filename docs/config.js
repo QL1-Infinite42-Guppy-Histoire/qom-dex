@@ -8,8 +8,8 @@ window.DEX_CONFIG = {
   rpcUrl: "https://rpc.qomx.io",
   explorer: "https://scan.qomx.io",
   nativeSymbol: "QOMX",
-  // Filled in after deployment:
-  factory: "",
-  router: "",
-  wqomx: "",
+  // Deployed 2026-11-21 by 0xa33e223BCF1BB82D475ea29a11f3ADD9c2E73A23 (feeToSetter):
+  factory: "0x1cC5CeEaF98A3b4e2BB2731f960D63CBe0BA8BFC",
+  router: "0xD0199c4EA87e4CfCc221f2efBC9f161a1331B1F4",
+  wqomx: "0x7DF7DDe45772E01e99aB05F1977E926516271897",
 };

@@ -73,8 +73,12 @@ gated on live reads: a pair with no pool / no reserves shows
 - [x] Contracts prepared + live estimateGas verification
 - [x] Local end-to-end swap test
 - [x] Frontend published
-- [ ] **On-chain deployment — waiting for the user's wallet signature**
-- [ ] First real swap — user's wallet test after deployment
+- [x] **On-chain deployment — done 2026-11-21**, verified by live reads:
+  WQOMX `0x7DF7DDe45772E01e99aB05F1977E926516271897` ·
+  Factory `0x1cC5CeEaF98A3b4e2BB2731f960D63CBe0BA8BFC` ·
+  Router02 `0xD0199c4EA87e4CfCc221f2efBC9f161a1331B1F4`
+  (feeTo unset, feeToSetter = deployer `0xa33e…73A23`, Router wiring matches)
+- [ ] First real pool + swap — user's wallet test (no pairs exist yet)
 
 ## License
 
