@@ -9,8 +9,8 @@ const PAIR_ABI = ["function getReserves() view returns (uint112,uint112,uint32)"
 const WQOMX_ABI = ["function deposit() payable","function withdraw(uint256)","function balanceOf(address) view returns (uint256)"];
 
 const I18N = {
-  en:{tabSwap:"Swap",tabPool:"Pool",tabWrap:"Wrap",tabDeploy:"Deploy",youPay:"You pay",youReceive:"You receive (estimated)",slippage:"Slippage %",connect:"Connect Wallet",connected:"Connected",wrongNet:"Wrong network — click Connect to switch to Qom (33303).",notDeployed:"The DEX contracts are not configured in this build.",pickToken:"Pick a token",importBtn:"Import",addLiq:"Add liquidity",removeLiq:"Remove liquidity",pairLabel:"Pair (Token A / Token B above)",wrapNote:"QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.",wrapBtn:"Wrap",unwrapBtn:"Unwrap",deployTitle:"Deploy the DEX (one time)",deployNote:"Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.",handoffTitle:"Addresses for Teh Fund / pool creators",copyBtn:"Copy",noPool:"No pool / no liquidity for this pair yet — quote unavailable. Create it in the Pool tab.",quoteOk:(r)=>`Rate ≈ ${r}`,needConnect:"Connect your wallet first.",needDeployed:"Contracts not configured in this build.",working:"Working… check your wallet.",done:(h)=>`Done ✓ tx: ${h}`,failed:(m)=>`Failed: ${m}`,bal:(b,s)=>`Balance: ${b} ${s}`,lpBal:(b)=>`Your LP balance: ${b}`,insufficient:"Amount exceeds your balance / allowance flow failed."},
-  ja:{tabSwap:"スワップ",tabPool:"プール",tabWrap:"ラップ",tabDeploy:"デプロイ",youPay:"支払う",youReceive:"受け取る（見込み）",slippage:"スリッページ %",connect:"ウォレット接続",connected:"接続済み",wrongNet:"ネットワークが違います —「ウォレット接続」から Qom (33303) に切り替えてください。",notDeployed:"DEXコントラクトがこのビルドに設定されていません。",pickToken:"トークンを選ぶ",importBtn:"追加",addLiq:"流動性を追加",removeLiq:"流動性を削除",pairLabel:"ペア（上の Token A / Token B）",wrapNote:"QOMX ⇄ WQOMX は常に 1:1。WQOMX は DEX で使う QOMX の ERC-20 版です。",wrapBtn:"ラップ",unwrapBtn:"アンラップ",deployTitle:"DEXをデプロイ（初回のみ）",deployNote:"あなたのウォレットから WQOMX → Factory → Router02 の順にデプロイします。各ステップであなたが署名し、鍵は誰にも渡りません。feeTo は未設定（プロトコル手数料OFF）、feeToSetter はあなたのアドレスです。ガス見積もり合計 ≈ 850万 gas — 現在のガス価格では約460 QOMX になるため、デプロイ用ウォレットには 600 QOMX 以上を用意してください。",handoffTitle:"Teh Fund / プール作成者向けアドレス一覧",copyBtn:"コピー",noPool:"このペアのプール／流動性がまだ無いため見積もりできません。「プール」タブで作成できます。",quoteOk:(r)=>`レート ≈ ${r}`,needConnect:"先にウォレットを接続してください。",needDeployed:"コントラクトがこのビルドに設定されていません。",working:"処理中… ウォレットを確認してください。",done:(h)=>`完了 ✓ tx: ${h}`,failed:(m)=>`失敗: ${m}`,bal:(b,s)=>`残高: ${b} ${s}`,lpBal:(b)=>`あなたのLP残高: ${b}`,insufficient:"残高不足、または承認フローに失敗しました。"}
+  en:{tabSwap:"Swap",tabPool:"Pool",tabWrap:"Wrap",tabDeploy:"Deploy",youPay:"You pay",youReceive:"You receive (estimated)",slippage:"Slippage %",connect:"Connect Wallet",connected:"Connected",wrongNet:"Wrong network — click Connect to switch to Qom (33303).",notDeployed:"The DEX contracts are not configured in this build.",pickToken:"Pick a token",importBtn:"Import",addLiq:"Add liquidity",removeLiq:"Remove liquidity",pairLabel:"Pair (Token A / Token B above)",wrapNote:"QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.",wrapBtn:"Wrap",unwrapBtn:"Unwrap",deployTitle:"Deploy the DEX (one time)",deployNote:"Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.",handoffTitle:"Addresses for Teh Fund / pool creators",copyBtn:"Copy",noPool:"No pool / no liquidity for this pair yet — quote unavailable. Create it in the Pool tab.",quoteOk:(r)=>`Rate ≈ ${r}`,needConnect:"Connect your wallet first.",needDeployed:"Contracts not configured in this build.",working:"Working… check your wallet.",done:(h)=>`Done ✓ tx: ${h}`,failed:(m)=>`Failed: ${m}`,bal:(b,s)=>`Balance: ${b} ${s}`,lpBal:(b)=>`Your LP balance: ${b}`,insufficient:"Amount exceeds your balance / allowance flow failed.",useWrap:"QOMX ⇄ WQOMX is 1:1 — use the Wrap tab, not Swap.",samePair:"Pick two different tokens for a pair."},
+  ja:{tabSwap:"スワップ",tabPool:"プール",tabWrap:"ラップ",tabDeploy:"デプロイ",youPay:"支払う",youReceive:"受け取る（見込み）",slippage:"スリッページ %",connect:"ウォレット接続",connected:"接続済み",wrongNet:"ネットワークが違います —「ウォレット接続」から Qom (33303) に切り替えてください。",notDeployed:"DEXコントラクトがこのビルドに設定されていません。",pickToken:"トークンを選ぶ",importBtn:"追加",addLiq:"流動性を追加",removeLiq:"流動性を削除",pairLabel:"ペア（上の Token A / Token B）",wrapNote:"QOMX ⇄ WQOMX は常に 1:1。WQOMX は DEX で使う QOMX の ERC-20 版です。",wrapBtn:"ラップ",unwrapBtn:"アンラップ",deployTitle:"DEXをデプロイ（初回のみ）",deployNote:"あなたのウォレットから WQOMX → Factory → Router02 の順にデプロイします。各ステップであなたが署名し、鍵は誰にも渡りません。feeTo は未設定（プロトコル手数料OFF）、feeToSetter はあなたのアドレスです。ガス見積もり合計 ≈ 850万 gas — 現在のガス価格では約460 QOMX になるため、デプロイ用ウォレットには 600 QOMX 以上を用意してください。",handoffTitle:"Teh Fund / プール作成者向けアドレス一覧",copyBtn:"コピー",noPool:"このペアのプール／流動性がまだ無いため見積もりできません。「プール」タブで作成できます。",quoteOk:(r)=>`レート ≈ ${r}`,needConnect:"先にウォレットを接続してください。",needDeployed:"コントラクトがこのビルドに設定されていません。",working:"処理中… ウォレットを確認してください。",done:(h)=>`完了 ✓ tx: ${h}`,failed:(m)=>`失敗: ${m}`,bal:(b,s)=>`残高: ${b} ${s}`,lpBal:(b)=>`あなたのLP残高: ${b}`,insufficient:"残高不足、または承認フローに失敗しました。",useWrap:"QOMX ⇄ WQOMX は 1:1 です — スワップではなく「ラップ」タブを使ってください。",samePair:"ペアには異なる2つのトークンを選んでください。"}
 };
 let lang = localStorage.getItem("qomdex-lang") || "en";
 const t = k => I18N[lang][k];
@@ -35,7 +35,7 @@ let liqA = tokenList()[0], liqB = tokenList()[1] || tokenList()[0];
 
 function fmt(n, d=6){ if(n===null||n===undefined||isNaN(n)) return "0"; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d}); }
 function deadline(){ return BigInt(Math.floor(Date.now()/1000)+1200); }
-function minOut(amount, slipPct){ const bps = BigInt(Math.round((100 - Number(slipPct))*100)); return amount * bps / 10000n; }
+function minOut(amount, slipPct){ let s = Number(slipPct); if(!(s>=0)) s = 0; if(s>50) s = 50; const bps = BigInt(Math.round((100 - s)*100)); return amount * bps / 10000n; }
 
 async function init(){
   readProvider = new ethers.JsonRpcProvider(CFG.rpcUrl, CFG.chainId);
@@ -109,6 +109,7 @@ async function refreshBalances(){
 async function quoteSwap(){
   const amt = $("swapInAmt").value; $("swapQuote").textContent=""; $("swapOutAmt").value="";
   if(!deployed() || !amt || Number(amt)<=0 || swapIn.address===swapOut.address) return;
+  if(effAddr(swapIn)===effAddr(swapOut)){ $("swapQuote").textContent = t("useWrap"); $("swapBtn").disabled = true; return; }
   try{
     const router = new ethers.Contract(addrs.router, ROUTER_ABI, readProvider);
     const amounts = await router.getAmountsOut(ethers.parseUnits(amt, swapIn.decimals), [effAddr(swapIn), effAddr(swapOut)]);
@@ -128,6 +129,7 @@ async function doSwap(){
   const st=$("swapStatus"); if(!account){ st.textContent=t("needConnect"); return; } if(!deployed()){ st.textContent=t("needDeployed"); return; }
   try{
     st.textContent=t("working");
+    if(effAddr(swapIn)===effAddr(swapOut)){ st.textContent = t("useWrap"); return; }
     const amtIn = ethers.parseUnits($("swapInAmt").value, swapIn.decimals);
     const router = new ethers.Contract(addrs.router, ROUTER_ABI, signer);
     const amounts = await router.getAmountsOut(amtIn, [effAddr(swapIn), effAddr(swapOut)]);
@@ -142,14 +144,15 @@ async function doSwap(){
 $("swapBtn").onclick = doSwap;
 
 async function refreshLp(){
-  if(!deployed() || !account || liqA.address===liqB.address) { $("lpBal").textContent=""; return; }
-  try{ const f=new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider); const pair=await f.getPair(effAddr(liqA), effAddr(liqB)); if(pair===ethers.ZeroAddress){ $("lpBal").textContent=t("noPool"); return; } const p=new ethers.Contract(pair, PAIR_ABI, readProvider); const b=await p.balanceOf(account); $("lpBal").textContent = t("lpBal")(fmt(ethers.formatEther(b)))+" · Pair: "+pair; $("liqRemoveBtn").disabled = b===0n; }
+  if(!deployed() || !account || effAddr(liqA)===effAddr(liqB)) { $("lpBal").textContent=""; $("liqRemoveBtn").disabled = true; return; }
+  try{ const f=new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider); const pair=await f.getPair(effAddr(liqA), effAddr(liqB)); if(pair===ethers.ZeroAddress){ $("lpBal").textContent=t("noPool"); $("liqRemoveBtn").disabled = true; return; } const p=new ethers.Contract(pair, PAIR_ABI, readProvider); const b=await p.balanceOf(account); $("lpBal").textContent = t("lpBal")(fmt(ethers.formatEther(b)))+" · Pair: "+pair; $("liqRemoveBtn").disabled = b===0n; }
   catch(e){ $("lpBal").textContent=""; }
 }
 async function doAddLiq(){
   const st=$("liqStatus"); if(!account){ st.textContent=t("needConnect"); return; }
   try{
     st.textContent=t("working");
+    if(effAddr(liqA)===effAddr(liqB)){ st.textContent = t("samePair"); return; }
     const aAmt=ethers.parseUnits($("liqAAmt").value, liqA.decimals), bAmt=ethers.parseUnits($("liqBAmt").value, liqB.decimals);
     const router=new ethers.Contract(addrs.router, ROUTER_ABI, signer); const slip=$("slippage").value||0.5;
     let tx;
@@ -172,7 +175,8 @@ async function doRemoveLiq(){
     st.textContent=t("working");
     const f=new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider); const pairAddr=await f.getPair(effAddr(liqA), effAddr(liqB));
     const pair=new ethers.Contract(pairAddr, PAIR_ABI, signer); const bal=await pair.balanceOf(account);
-    const amt = bal * BigInt($("liqRemovePct").value||100) / 100n;
+    let pct = Math.floor(Number($("liqRemovePct").value||100)); if(!(pct>=1)) pct = 1; if(pct>100) pct = 100;
+    const amt = bal * BigInt(pct) / 100n;
     const al=await pair.allowance(account, addrs.router); if(al<amt){ const txa=await pair.approve(addrs.router, amt); await txa.wait(); }
     const router=new ethers.Contract(addrs.router, ROUTER_ABI, signer); let tx;
     if(liqA.address==="native"||liqB.address==="native"){ const tok=liqA.address==="native"?liqB:liqA; tx=await router.removeLiquidityETH(tok.address, amt, 0, 0, account, deadline()); }
