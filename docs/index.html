@@ -116,7 +116,7 @@
     <p class="quote"><span data-i18n="adminCur">Current feeToSetter</span>: <span class="addr" id="adminCurAddr">—</span></p>
     <p class="quote"><span data-i18n="adminFeeTo">Protocol fee recipient (feeTo)</span>: <span class="addr" id="adminFeeToVal">—</span></p>
     <div class="panel"><label data-i18n="adminNew">New feeToSetter address</label>
-      <div class="row"><input type="text" id="adminNewAddr" value="0x570AE9e37d209d6Db818d54Bfc05c4D90696c40a" spellcheck="false"></div>
+      <div class="row"><input type="text" id="adminNewAddr" placeholder="0x…" spellcheck="false"></div>
     </div>
     <p class="note" data-i18n="adminNote">This only hands over the right to set the protocol fee in future. The fee recipient stays unset and no funds move. One signature from the current feeToSetter wallet.</p>
     <button class="btn primary big" id="adminTransferBtn" data-i18n="adminBtn">Transfer feeToSetter role</button>
@@ -142,7 +142,7 @@
   </footer>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="ethers.umd.min.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 </body>

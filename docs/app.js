@@ -16,15 +16,16 @@ let lang = localStorage.getItem("qomdex-lang") || "en";
 const t = k => I18N[lang][k];
 
 let readProvider, provider, signer, account = null;
+function safeParse(s, fb){ try{ const v = JSON.parse(s); return v ?? fb; }catch(e){ return fb; } }
 let addrs = loadAddrs();
 function loadAddrs(){
-  const ls = JSON.parse(localStorage.getItem("qomdex-addrs") || "{}");
+  const ls = safeParse(localStorage.getItem("qomdex-addrs") || "{}", {});
   return { factory: CFG.factory || ls.factory || "", router: CFG.router || ls.router || "", wqomx: CFG.wqomx || ls.wqomx || "" };
 }
 function saveAddrs(){ localStorage.setItem("qomdex-addrs", JSON.stringify(addrs)); refreshDeployedUI(); }
 const deployed = () => !!(addrs.factory && addrs.router && addrs.wqomx);
 
-let customTokens = JSON.parse(localStorage.getItem("qomdex-tokens") || "[]");
+let customTokens = safeParse(localStorage.getItem("qomdex-tokens") || "[]", []); if(!Array.isArray(customTokens)) customTokens = [];
 function tokenList(){
   const list = [];
   if(CFG.qomxErc20) list.push({symbol:"QOMX", address:CFG.qomxErc20, decimals:18, tag:"official"});
@@ -77,9 +78,12 @@ async function connect(){
   // provider request, then switch again.
   try{ await window.ethereum.request({method:"wallet_switchEthereumChain", params:[{chainId:hexId}]}); }
   catch(switchErr){
+    if(switchErr && switchErr.code === 4001) throw switchErr; // user rejected: do not pop the add-chain dialog
     await window.ethereum.request({method:"wallet_addEthereumChain", params:addParams});
     await window.ethereum.request({method:"wallet_switchEthereumChain", params:[{chainId:hexId}]});
   }
+  const net = await provider.getNetwork();
+  if(Number(net.chainId) !== CFG.chainId){ $("netNotice").hidden=false; $("netNotice").textContent = t("wrongNet"); return; }
   signer = await provider.getSigner(); account = await signer.getAddress();
   $("connectBtn").textContent = t("connected")+": "+account.slice(0,6)+"…"+account.slice(-4);
   refreshDeployedUI(); refreshBalances(); quoteSwap(); refreshLp(); checkAdmin();
@@ -96,8 +100,10 @@ $("swapInTok").onclick=()=>openPicker(v=>swapIn=v); $("swapOutTok").onclick=()=>
 $("liqATok").onclick=()=>openPicker(v=>liqA=v); $("liqBTok").onclick=()=>openPicker(v=>liqB=v);
 $("tokClose").onclick=()=>$("tokDlg").close();
 $("addTokBtn").onclick = async ()=>{
-  const a = $("customTokAddr").value.trim();
-  try{ const c = new ethers.Contract(a, ERC20_ABI, readProvider); const [s,d] = await Promise.all([c.symbol(), c.decimals()]); const tok={symbol:s, address:a, decimals:Number(d)}; customTokens.push(tok); localStorage.setItem("qomdex-tokens", JSON.stringify(customTokens)); $("tokStatus").textContent = "✓ "+s; if(pickerTarget) pickerTarget(tok); renderTokButtons(); }
+  const raw = $("customTokAddr").value.trim();
+  if(!ethers.isAddress(raw)){ $("tokStatus").textContent = t("failed")("not a valid address"); return; }
+  const a = ethers.getAddress(raw);
+  try{ const c = new ethers.Contract(a, ERC20_ABI, readProvider); const [s,d] = await Promise.all([c.symbol(), c.decimals()]); const dec = Number(d); if(!(dec>=0 && dec<=36) || !s) throw new Error("bad token metadata"); const tok={symbol:String(s).slice(0,32), address:a, decimals:dec}; customTokens = customTokens.filter(x=>x.address.toLowerCase()!==a.toLowerCase()); customTokens.push(tok); localStorage.setItem("qomdex-tokens", JSON.stringify(customTokens)); $("tokStatus").textContent = "✓ "+tok.symbol; if(pickerTarget) pickerTarget(tok); renderTokButtons(); }
   catch(e){ $("tokStatus").textContent = t("failed")("not an ERC-20 readable at this address"); }
 };
 
@@ -111,17 +117,22 @@ async function refreshBalances(){
   if(!account) return;
   for(const [tok,el] of [[swapIn,"swapInBal"],[swapOut,"swapOutBal"]]){ try{ const b=await balOf(tok,account); $(el).textContent = t("bal")(fmt(ethers.formatUnits(b, tok.decimals)), tok.symbol); }catch(e){ $(el).textContent=""; } }
 }
+let quoteSeq = 0;
 async function quoteSwap(){
+  const seq = ++quoteSeq;
   const amt = $("swapInAmt").value; $("swapQuote").textContent=""; $("swapOutAmt").value="";
   if(!deployed() || !amt || Number(amt)<=0 || swapIn.address===swapOut.address) return;
-  if(effAddr(swapIn)===effAddr(swapOut)){ $("swapQuote").textContent = t("useWrap"); $("swapBtn").disabled = true; return; }
+  const aIn = effAddr(swapIn).toLowerCase(), aOut = effAddr(swapOut).toLowerCase();
+  const wrapPair = (aIn===CFG.qomxErc20.toLowerCase() && aOut===addrs.wqomx.toLowerCase()) || (aOut===CFG.qomxErc20.toLowerCase() && aIn===addrs.wqomx.toLowerCase());
+  if(effAddr(swapIn)===effAddr(swapOut) || wrapPair){ $("swapQuote").textContent = t("useWrap"); $("swapBtn").disabled = true; return; }
   try{
     const router = new ethers.Contract(addrs.router, ROUTER_ABI, readProvider);
     const amounts = await router.getAmountsOut(ethers.parseUnits(amt, swapIn.decimals), [effAddr(swapIn), effAddr(swapOut)]);
+    if(seq !== quoteSeq) return; // a newer quote superseded this one
     $("swapOutAmt").value = fmt(ethers.formatUnits(amounts[1], swapOut.decimals));
     $("swapQuote").textContent = t("quoteOk")(`1 ${swapIn.symbol} = ${fmt(Number(ethers.formatUnits(amounts[1],swapOut.decimals))/Number(amt))} ${swapOut.symbol}`);
     $("swapBtn").disabled = !account;
-  }catch(e){ $("swapQuote").textContent = t("noPool"); $("swapBtn").disabled = true; }
+  }catch(e){ if(seq === quoteSeq){ $("swapQuote").textContent = t("noPool"); $("swapBtn").disabled = true; } }
 }
 $("swapInAmt").addEventListener("input", quoteSwap);
 
@@ -136,6 +147,8 @@ async function doSwap(){
     st.textContent=t("working");
     if(effAddr(swapIn)===effAddr(swapOut)){ st.textContent = t("useWrap"); return; }
     const amtIn = ethers.parseUnits($("swapInAmt").value, swapIn.decimals);
+    if(amtIn <= 0n){ st.textContent = t("insufficient"); return; }
+    const balIn = await balOf(swapIn, account); if(balIn !== null && balIn < amtIn){ st.textContent = t("insufficient"); return; }
     const router = new ethers.Contract(addrs.router, ROUTER_ABI, signer);
     const amounts = await router.getAmountsOut(amtIn, [effAddr(swapIn), effAddr(swapOut)]);
     const outMin = minOut(amounts[1], $("slippage").value || 0.5);
@@ -159,10 +172,11 @@ async function loadPools(){
       const pc = new ethers.Contract(pair, PAIR_ABI, readProvider);
       const [t0, t1, r] = await Promise.all([pc.token0(), pc.token1(), pc.getReserves()]);
       const sym = async a => { try{ return await new ethers.Contract(a, ERC20_ABI, readProvider).symbol(); }catch(e){ return a.slice(0,6)+"…"; } };
-      const [s0, s1] = await Promise.all([sym(t0), sym(t1)]);
+      const dec = async a => { try{ return Number(await new ethers.Contract(a, ERC20_ABI, readProvider).decimals()); }catch(e){ return 18; } };
+      const [s0, s1, d0, d1] = await Promise.all([sym(t0), sym(t1), dec(t0), dec(t1)]);
       const row = document.createElement("div"); row.className = "pool-row";
       const a = document.createElement("a"); a.href = CFG.explorer + "/address/" + pair; a.target = "_blank"; a.rel = "noopener"; a.textContent = s0 + " / " + s1;
-      const span = document.createElement("span"); span.textContent = fmt(ethers.formatEther(r[0])) + " " + s0 + " · " + fmt(ethers.formatEther(r[1])) + " " + s1;
+      const span = document.createElement("span"); span.textContent = fmt(ethers.formatUnits(r[0], d0)) + " " + s0 + " · " + fmt(ethers.formatUnits(r[1], d1)) + " " + s1;
       row.appendChild(a); row.appendChild(span); el.appendChild(row);
     }
   }catch(e){ /* leave as-is */ }
@@ -180,6 +194,7 @@ async function doAddLiq(){
     st.textContent=t("working");
     if(effAddr(liqA)===effAddr(liqB)){ st.textContent = t("samePair"); return; }
     const aAmt=ethers.parseUnits($("liqAAmt").value, liqA.decimals), bAmt=ethers.parseUnits($("liqBAmt").value, liqB.decimals);
+    if(aAmt <= 0n || bAmt <= 0n){ st.textContent = t("insufficient"); return; }
     const router=new ethers.Contract(addrs.router, ROUTER_ABI, signer); const slip=$("slippage").value||0.5;
     let tx;
     if(liqA.address==="native"||liqB.address==="native"){
@@ -200,13 +215,22 @@ async function doRemoveLiq(){
   try{
     st.textContent=t("working");
     const f=new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider); const pairAddr=await f.getPair(effAddr(liqA), effAddr(liqB));
+    if(pairAddr===ethers.ZeroAddress){ st.textContent = t("noPool"); return; }
     const pair=new ethers.Contract(pairAddr, PAIR_ABI, signer); const bal=await pair.balanceOf(account);
     let pct = Math.floor(Number($("liqRemovePct").value||100)); if(!(pct>=1)) pct = 1; if(pct>100) pct = 100;
     const amt = bal * BigInt(pct) / 100n;
+    if(amt <= 0n){ st.textContent = t("insufficient"); return; }
     const al=await pair.allowance(account, addrs.router); if(al<amt){ const txa=await pair.approve(addrs.router, amt); await txa.wait(); }
+    // slippage-protected minimums from the pair's live reserves and total supply
+    const [res, ts, t0] = await Promise.all([pair.getReserves(), pair.totalSupply(), pair.token0()]);
+    const exp0 = amt * res[0] / ts, exp1 = amt * res[1] / ts;
+    const aIs0 = effAddr(liqA).toLowerCase() === t0.toLowerCase();
+    const expA = aIs0 ? exp0 : exp1, expB = aIs0 ? exp1 : exp0;
+    const slip = $("slippage").value || 0.5;
+    const minA = minOut(expA, slip), minB = minOut(expB, slip);
     const router=new ethers.Contract(addrs.router, ROUTER_ABI, signer); let tx;
-    if(liqA.address==="native"||liqB.address==="native"){ const tok=liqA.address==="native"?liqB:liqA; tx=await router.removeLiquidityETH(tok.address, amt, 0, 0, account, deadline()); }
-    else tx=await router.removeLiquidity(liqA.address, liqB.address, amt, 0, 0, account, deadline());
+    if(liqA.address==="native"||liqB.address==="native"){ const tok=liqA.address==="native"?liqB:liqA; const minTok = liqA.address==="native"? minB : minA; const minEth = liqA.address==="native"? minA : minB; tx=await router.removeLiquidityETH(tok.address, amt, minTok, minEth, account, deadline()); }
+    else tx=await router.removeLiquidity(liqA.address, liqB.address, amt, minA, minB, account, deadline());
     const r=await tx.wait(); st.textContent=t("done")(r.hash); refreshLp(); loadPools();
   }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); }
 }
@@ -242,7 +266,7 @@ $("adminTransferBtn").onclick=async()=>{
     if(now.toLowerCase()!==account.toLowerCase()) setTimeout(()=>{ $("tab-admin").hidden=true; }, 5000);
   }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); }
 };
-$("wrapBtn").onclick = async ()=>{ const st=$("wrapStatus"); try{ st.textContent=t("working"); const w=new ethers.Contract(addrs.wqomx, WQOMX_ABI, signer); const tx=await w.deposit({value: ethers.parseEther($("wrapAmt").value)}); const r=await tx.wait(); st.textContent=t("done")(r.hash); }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); } };
-$("unwrapBtn").onclick = async ()=>{ const st=$("wrapStatus"); try{ st.textContent=t("working"); const w=new ethers.Contract(addrs.wqomx, WQOMX_ABI, signer); const tx=await w.withdraw(ethers.parseEther($("unwrapAmt").value)); const r=await tx.wait(); st.textContent=t("done")(r.hash); }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); } };
+$("wrapBtn").onclick = async ()=>{ const st=$("wrapStatus"); if(!account){ st.textContent=t("needConnect"); return; } try{ const v=ethers.parseEther($("wrapAmt").value||"0"); if(v<=0n){ st.textContent=t("insufficient"); return; } st.textContent=t("working"); const w=new ethers.Contract(addrs.wqomx, WQOMX_ABI, signer); const tx=await w.deposit({value: v}); const r=await tx.wait(); st.textContent=t("done")(r.hash); refreshBalances(); }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); } };
+$("unwrapBtn").onclick = async ()=>{ const st=$("wrapStatus"); if(!account){ st.textContent=t("needConnect"); return; } try{ const v=ethers.parseEther($("unwrapAmt").value||"0"); if(v<=0n){ st.textContent=t("insufficient"); return; } st.textContent=t("working"); const w=new ethers.Contract(addrs.wqomx, WQOMX_ABI, signer); const tx=await w.withdraw(v); const r=await tx.wait(); st.textContent=t("done")(r.hash); refreshBalances(); }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); } };
 
 init();

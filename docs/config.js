@@ -1,7 +1,5 @@
-// Qom DEX — deployment config.
-// After the one-time deployment (Deploy tab, from your own wallet),
-// paste the three addresses here and commit, OR just deploy from the
-// site: the deploying browser remembers them in localStorage.
+// Qom DEX — deployment config (addresses pinned at deployment, 2026-11-21).
+// The config values below take precedence over any browser-local copies.
 window.DEX_CONFIG = {
   chainId: 33303,
   chainName: "Qom",
