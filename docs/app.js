@@ -212,6 +212,36 @@ async function doRemoveLiq(){
 }
 $("liqRemoveBtn").onclick = doRemoveLiq;
 
+// ---------- Factory admin (visible only to the current feeToSetter) ----------
+async function checkAdmin(){
+  const sec=$("tab-admin"); if(!sec) return;
+  if(!account){ sec.hidden=true; return; }
+  try{
+    const f=new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider);
+    const setter=await f.feeToSetter();
+    if(setter.toLowerCase()!==account.toLowerCase()){ sec.hidden=true; return; }
+    sec.hidden=false;
+    $("adminCurAddr").textContent=setter;
+    const ft=await f.feeTo();
+    $("adminFeeToVal").textContent=(ft===ethers.ZeroAddress)?t("feeToUnset"):ft;
+  }catch(e){ sec.hidden=true; }
+}
+$("adminTransferBtn").onclick=async()=>{
+  const st=$("adminStatus");
+  let target=($("adminNewAddr").value||"").trim();
+  if(!ethers.isAddress(target)){ st.textContent=t("adminBadAddr"); return; }
+  target=ethers.getAddress(target);
+  try{
+    st.textContent=t("working");
+    const f=new ethers.Contract(addrs.factory, FACTORY_ABI, signer);
+    const tx=await f.setFeeToSetter(target);
+    const r=await tx.wait();
+    const now=await new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider).feeToSetter();
+    st.textContent=t("adminDone")+" "+now+" \u00b7 tx: "+r.hash;
+    $("adminCurAddr").textContent=now;
+    if(now.toLowerCase()!==account.toLowerCase()) setTimeout(()=>{ $("tab-admin").hidden=true; }, 5000);
+  }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); }
+};
 $("wrapBtn").onclick = async ()=>{ const st=$("wrapStatus"); try{ st.textContent=t("working"); const w=new ethers.Contract(addrs.wqomx, WQOMX_ABI, signer); const tx=await w.deposit({value: ethers.parseEther($("wrapAmt").value)}); const r=await tx.wait(); st.textContent=t("done")(r.hash); }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); } };
 $("unwrapBtn").onclick = async ()=>{ const st=$("wrapStatus"); try{ st.textContent=t("working"); const w=new ethers.Contract(addrs.wqomx, WQOMX_ABI, signer); const tx=await w.withdraw(ethers.parseEther($("unwrapAmt").value)); const r=await tx.wait(); st.textContent=t("done")(r.hash); }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); } };
 
