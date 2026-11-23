@@ -32,7 +32,7 @@ Uniswap V2, used as-is (logic unmodified):
   build artifact.
 
 Swap fee: **0.3%** (standard V2). Factory `feeTo` starts **unset**
-(protocol fee OFF); `feeToSetter` is the deploying address.
+(protocol fee OFF); `feeToSetter` was transferred on 2026-11-23 to a dedicated wallet `0x570AE9e37d209d6Db818d54Bfc05c4D90696c40a` (the deploying address no longer holds any admin rights).
 
 ## Live verification done before shipping (2026-11-21)
 
@@ -77,7 +77,7 @@ gated on live reads: a pair with no pool / no reserves shows
   WQOMX `0x7DF7DDe45772E01e99aB05F1977E926516271897` ·
   Factory `0x1cC5CeEaF98A3b4e2BB2731f960D63CBe0BA8BFC` ·
   Router02 `0xD0199c4EA87e4CfCc221f2efBC9f161a1331B1F4`
-  (feeTo unset, feeToSetter = deployer `0xa33e…73A23`, Router wiring matches)
+  (feeTo unset; feeToSetter was the deployer `0xa33e…73A23` at deployment, transferred 2026-11-23 to `0x570A…c40a`; Router wiring matches)
 - [ ] First real pool + swap — user's wallet test (no pairs exist yet)
 
 ## License
