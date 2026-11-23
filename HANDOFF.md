@@ -44,3 +44,14 @@ moved or changed on-chain, so the Q/QOMX pair can be created anytime with
 Factory.createPair(Q, 0xD4949664cD82660AaE99bEdc034a0deA8A0bd517).
 About the swap not opening in your MetaMask — was that on mobile or desktop,
 and what did you see? I want to fix that first."
+
+## Audit 2026-11-24 (community DEX, frontend only)
+On-chain state re-verified: all three contracts present, Router wiring correct,
+feeToSetter = dedicated wallet 0x570A…c40a (transfer persisted), feeTo unset, pairs 0.
+Fixed and live-verified: ethers 6.13.4 vendored locally (was an integrity-less CDN
+script; sha256 fd66c046…); connect() chainId verification + user-rejection respected;
+amount/balance validation on swap/add-liquidity/wrap; quote race guard; QOMX<->WQOMX
+routes to Wrap guidance; remove-liquidity slippage minimums from live reserves
+(was 0/0) + pair/zero guards; pool list per-token decimals; custom-token import
+validation/dedupe; localStorage parse hardening; stale admin prefill removed.
+Contracts themselves are immutable and were not touched.
