@@ -34,6 +34,29 @@ Uniswap V2, used as-is (logic unmodified):
 Swap fee: **0.3%** (standard V2). Factory `feeTo` starts **unset**
 (protocol fee OFF); `feeToSetter` was transferred on 2026-11-23 to a dedicated wallet `0x570AE9e37d209d6Db818d54Bfc05c4D90696c40a` (the deploying address no longer holds any admin rights).
 
+## Official DEX connection (2026-11-24)
+
+On 2026-11-24 Teh Fund deployed the **official** Qom DEX contracts himself,
+and this repo's frontend (the GitHub Pages site above) now connects to them:
+
+- `WQOMX` — `0x837a9389C412b2dfca2B97E511305B2B08B96572`
+- `QOMFactory` — `0x35e759b084d97919138Ac8CbC8182fE68dcf69c3`
+- `QOMRouter02` — `0x6d114d36F04941dCf5dD26445AB975bf7A4f1A34`
+
+Verified on-chain before connecting (2026-11-24, block ≈ 106,489): code
+present at all three addresses; `Router.factory()` and `Router.WETH()` return
+exactly the Factory / WQOMX above; all three are source-verified on
+scan.qomx.io (names WQOMX / QOMFactory / QOMRouter02); WQOMX is a standard
+wrapped-native token (deposit/withdraw, 18 decimals, supply 0);
+`allPairsLength` = 0 — **no pools yet, and no real swap has been done**.
+Factory `feeToSetter` = Teh Fund's deployer `0x77096a50f1B2B9CE2fac9c0EDcc676C1aeD32BFb`;
+`feeTo` = `0x58C2264175e4252e1938aC42cfbdC92Eac33CE3c` (set by Teh Fund on
+2026-11-24, so the protocol fee is ON for these contracts).
+
+The 2026-11-21 community deployment below stays on-chain untouched — only
+the frontend config (`docs/config.js`) switched. The official QOMX ERC-20
+(`0xD494…0517`) remains the main listed token, as before.
+
 ## Live verification done before shipping (2026-11-21)
 
 Against `https://rpc.qomx.io` (chain 33303, block ≈ 64,079 at check time):
@@ -78,7 +101,8 @@ gated on live reads: a pair with no pool / no reserves shows
   Factory `0x1cC5CeEaF98A3b4e2BB2731f960D63CBe0BA8BFC` ·
   Router02 `0xD0199c4EA87e4CfCc221f2efBC9f161a1331B1F4`
   (feeTo unset; feeToSetter was the deployer `0xa33e…73A23` at deployment, transferred 2026-11-23 to `0x570A…c40a`; Router wiring matches)
-- [ ] First real pool + swap — user's wallet test (no pairs exist yet)
+- [x] **Frontend connected to Teh Fund's official DEX contracts — 2026-11-24** (see "Official DEX connection" above; community deployment stays on-chain)
+- [ ] First real pool + swap — on the official Factory (no pairs exist yet, on either deployment)
 
 ## License
 

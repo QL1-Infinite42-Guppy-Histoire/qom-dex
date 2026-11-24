@@ -1,4 +1,4 @@
-// Qom DEX — deployment config (addresses pinned at deployment, 2026-11-21).
+// Qom DEX — deployment config (official DEX contracts, connected 2026-11-24).
 // The config values below take precedence over any browser-local copies.
 window.DEX_CONFIG = {
   chainId: 33303,
@@ -6,10 +6,16 @@ window.DEX_CONFIG = {
   rpcUrl: "https://rpc.qomx.io",
   explorer: "https://scan.qomx.io",
   nativeSymbol: "QOMX",
-  // Deployed 2026-11-21 by 0xa33e223BCF1BB82D475ea29a11f3ADD9c2E73A23; feeToSetter transferred 2026-11-23 to the dedicated wallet 0x570AE9e37d209d6Db818d54Bfc05c4D90696c40a:
-  factory: "0x1cC5CeEaF98A3b4e2BB2731f960D63CBe0BA8BFC",
-  router: "0xD0199c4EA87e4CfCc221f2efBC9f161a1331B1F4",
-  wqomx: "0x7DF7DDe45772E01e99aB05F1977E926516271897",
+  // OFFICIAL Qom DEX contracts, deployed by Teh Fund on 2026-11-24 and
+  // source-verified on scan.qomx.io. Wiring verified on-chain 2026-11-24
+  // (Router.factory() / Router.WETH() match the addresses below):
+  // Factory feeToSetter = Teh Fund's deployer 0x77096a50f1B2B9CE2fac9c0EDcc676C1aeD32BFb;
+  // feeTo = 0x58C2264175e4252e1938aC42cfbdC92Eac33CE3c (set by Teh Fund 2026-11-24).
+  // The 2026-11-21 community deployment (Factory 0x1cC5…8BFC etc.) stays
+  // on-chain untouched; this frontend now points at the official contracts.
+  factory: "0x35e759b084d97919138Ac8CbC8182fE68dcf69c3",
+  router: "0x6d114d36F04941dCf5dD26445AB975bf7A4f1A34",
+  wqomx: "0x837a9389C412b2dfca2B97E511305B2B08B96572",
   // Official QOMX ERC-20 contract on Qom chain (per Teh Fund, 2026-11-21).
   // It is the ERC-20 mirror of native QOMX: balanceOf(addr) == native balance,
   // totalSupply == 200M genesis supply (both verified on-chain 2026-11-21).

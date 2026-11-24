@@ -45,6 +45,33 @@ Factory.createPair(Q, 0xD4949664cD82660AaE99bEdc034a0deA8A0bd517).
 About the swap not opening in your MetaMask — was that on mobile or desktop,
 and what did you see? I want to fix that first."
 
+## Update 2026-11-24 — frontend connected to the OFFICIAL DEX
+
+Teh Fund deployed his own official contracts and sent the addresses; the
+frontend in this repo now points at them (`docs/config.js`). Verified
+on-chain first (block ≈ 106,489): code at all three, Router wiring matches,
+all three source-verified on scan.qomx.io, `allPairsLength` = 0.
+
+```
+WQOMX:    0x837a9389C412b2dfca2B97E511305B2B08B96572
+Factory:  0x35e759b084d97919138Ac8CbC8182fE68dcf69c3 (QOMFactory)
+Router02: 0x6d114d36F04941dCf5dD26445AB975bf7A4f1A34 (QOMRouter02)
+```
+
+Factory state at connection time: feeToSetter = Teh Fund's deployer
+0x77096a50f1B2B9CE2fac9c0EDcc676C1aeD32BFb. NOTE: feeTo was UNSET at the
+first read (block 106,480) and was then set — during the verification
+window — to 0x58C2264175e4252e1938aC42cfbdC92Eac33CE3c (the address the
+user had asked to be made feeToSetter). So that address is currently the
+feeTo (protocol fee recipient; protocol fee ON), NOT the feeToSetter —
+Teh Fund retains feeToSetter and can change feeTo at any time. Flagged to
+the user 2026-11-24.
+
+The community deployment in the block at the top of this file stays
+on-chain untouched. Site copy now reads as the official DEX (contracts by
+Teh Fund, frontend by the community) with the honest limits kept: no
+pools yet, first real swap not done.
+
 ## Audit 2026-11-24 (community DEX, frontend only)
 On-chain state re-verified: all three contracts present, Router wiring correct,
 feeToSetter = dedicated wallet 0x570A…c40a (transfer persisted), feeTo unset, pairs 0.
