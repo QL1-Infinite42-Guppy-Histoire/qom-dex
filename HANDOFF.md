@@ -123,3 +123,25 @@ could block the account step entirely. Fix (frontend only): connect() now
 calls eth_requestAccounts explicitly FIRST, before the chain switch; the
 no-wallet MetaMask deep link is built from the current location. Verified
 in the harness (accounts first, prompt triggered, full connect) and live.
+
+## Official connection + Teh Fund review fixes 2026-11-24
+The frontend now points at Teh Fund's OFFICIAL contracts (connected by the
+user's other session, commits 9a234cc..bf2b901): Factory 0x35e7…69c3,
+Router 0x6d11…1A34, WQOMX 0x837a…6572. feeTo = 0x58C2…CE3c (frontend
+builder); feeToSetter stays with Teh Fund — CONFIRMED INTENTIONAL by him;
+the earlier audit note M-1 is withdrawn, no confirmation DM needed.
+Q/QOMX pool is LIVE: pair 0x53578385cAb6BA7563F8BB493C1D4bfB63b5bc7B,
+Q = 0xd53D9f937537262F78AEC261785D731E9E829138 (Q Stablecoin, 6 dp),
+reserves at fix time ≈ 7,530,220 QOMX / 9,999.87 Q; quote 100 QOMX →
+0.132396 Q reproduced; impact at 1M QOMX = 11.96%.
+Review fixes shipped (commit cb2b6fe, live-verified): Q built-in with label
+"Q (on QOM)" and QOMX/Q defaults on both tabs; banner states the pool is
+live; price impact (>3% warn, >10% red) + minimum received + 0.3% fee shown
+from the displayed quote; gasLimit = estimate x1.2 on ALL sends (QOM charges
+>=50% of the limit, so no extra padding); add-liquidity ratio auto-fill via
+Router.quote + pool-share display; QOMX MAX button keeps a live-estimated
+gas reserve and doSwap refuses gas-starving sends; Wrap tab removed (no
+WQOMX pool exists; pools use 0xD494 directly); Factory admin section removed
+from the public site; decimal-overflow inputs show an explicit message;
+naming unified to QOM (title, chain name in wallet prompts, UI strings).
+The 2026-11-21 community contracts stay on-chain untouched.
