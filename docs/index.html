@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Qom DEX — Swap on Qom Chain (33303)</title>
-<meta name="description" content="A normal Uniswap V2-style DEX for the Qom chain (EVM 33303, QOMX). Swap and provide liquidity from your own wallet.">
+<title>QOM DEX — Swap on QOM Chain (33303)</title>
+<meta name="description" content="A normal Uniswap V2-style DEX for the QOM chain (EVM 33303, QOMX). Swap and provide liquidity from your own wallet.">
 <script>try{if(localStorage.getItem('guppy-theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
 <link rel="icon" type="image/jpeg" href="logo.jpg">
-<meta property="og:title" content="Qom DEX — Swap on Qom Chain (33303)">
+<meta property="og:title" content="QOM DEX — Swap on QOM Chain (33303)">
 <meta property="og:image" content="logo.jpg">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
   <div class="wrap head-in">
-    <div class="brand"><img class="brand-logo" src="logo.jpg" alt="Qom"> Qom DEX <span class="tag">Qom Chain · 33303</span></div>
+    <div class="brand"><img class="brand-logo" src="logo.jpg" alt="QOM"> QOM DEX <span class="tag">QOM Chain · 33303</span></div>
     <div class="head-btns">
       <button id="langBtn" class="chip-btn">日本語</button>
       <button id="themeBtn" class="chip-btn">🌙 Dark</button>
@@ -26,7 +26,7 @@
 </header>
 
 <main class="wrap">
-  <p class="notice warn" data-i18n="devNotice">🚧 The official QOM DEX — contracts deployed by Teh Fund, frontend built by the community. No pools are live yet and the first real swap has not been done. Use at your own risk.</p>
+  <p class="notice warn" data-i18n="devNotice">🚧 The official QOM DEX — contracts deployed by Teh Fund, frontend built by the community. The Q/QOMX pool is live; liquidity is still thin, so check the price impact before swapping. Use at your own risk.</p>
   <p id="notDeployed" class="notice" hidden></p>
   <p id="netNotice" class="notice warn" hidden></p>
   <p id="readWarn" class="notice warn" hidden></p>
@@ -35,7 +35,6 @@
   <nav class="tabs">
     <button class="tab active" data-tab="swap" data-i18n="tabSwap">Swap</button>
     <button class="tab" data-tab="pool" data-i18n="tabPool">Pool</button>
-    <button class="tab" data-tab="wrap" data-i18n="tabWrap">Wrap</button>
   </nav>
 
   <!-- SWAP -->
@@ -48,13 +47,14 @@
         <button id="swapInTok" class="tok-btn">QOMX ▾</button>
       </div>
       <div class="bal" id="swapInBal"></div>
+      <div class="bal"><button id="swapInMax" class="chip-btn" hidden data-i18n="maxGas">MAX (keep gas)</button></div>
     </div>
     <div class="arrow">↓</div>
     <div class="panel">
       <label data-i18n="youReceive">You receive (estimated)</label>
       <div class="row">
         <input id="swapOutAmt" type="text" readonly placeholder="0.0">
-        <button id="swapOutTok" class="tok-btn">WQOMX ▾</button>
+        <button id="swapOutTok" class="tok-btn">Q (on QOM) ▾</button>
       </div>
       <div class="bal" id="swapOutBal"></div>
     </div>
@@ -64,6 +64,9 @@
     </div>
     <p class="status warn" id="slipWarn"></p>
     <p class="quote" id="swapQuote"></p>
+    <p class="quote" id="swapImpact"></p>
+    <p class="quote" id="swapMinRecv"></p>
+    <p class="quote" id="swapFee"></p>
     <button id="swapBtn" class="btn primary big" disabled>Swap</button>
     <p class="status" id="swapStatus"></p>
     <p class="note" data-i18n="qomxNote"></p>
@@ -78,7 +81,7 @@
     </div>
     <div class="panel">
       <label>Token B</label>
-      <div class="row"><input id="liqBAmt" type="number" min="0" step="any" placeholder="0.0"><button id="liqBTok" class="tok-btn">WQOMX ▾</button></div>
+      <div class="row"><input id="liqBAmt" type="number" min="0" step="any" placeholder="0.0"><button id="liqBTok" class="tok-btn">Q (on QOM) ▾</button></div>
     </div>
     <p class="quote" id="liqQuote"></p>
     <button id="liqBtn" class="btn primary big" disabled data-i18n="addLiq">Add liquidity</button>
@@ -97,33 +100,8 @@
     <div id="poolList" class="pool-list"><p class="muted">…</p></div>
   </section>
 
-  <!-- WRAP -->
-  <section id="tab-wrap" class="card" hidden>
-    <h2 data-i18n="tabWrap">Wrap / Unwrap</h2>
-    <p class="muted" data-i18n="wrapNote">QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.</p>
-    <div class="panel"><label>QOMX → WQOMX</label>
-      <div class="row"><input id="wrapAmt" type="number" min="0" step="any" placeholder="0.0"><button id="wrapBtn" class="btn primary" disabled data-i18n="wrapBtn">Wrap</button></div>
-    </div>
-    <div class="panel"><label>WQOMX → QOMX</label>
-      <div class="row"><input id="unwrapAmt" type="number" min="0" step="any" placeholder="0.0"><button id="unwrapBtn" class="btn primary" disabled data-i18n="unwrapBtn">Unwrap</button></div>
-    </div>
-    <p class="status" id="wrapStatus"></p>
-  </section>
-
   <!-- Token picker -->
 
-  <!-- Factory admin: rendered only for the current feeToSetter -->
-  <section class="card" id="tab-admin" hidden>
-    <h2 data-i18n="adminTitle">Factory admin</h2>
-    <p class="quote"><span data-i18n="adminCur">Current feeToSetter</span>: <span class="addr" id="adminCurAddr">—</span></p>
-    <p class="quote"><span data-i18n="adminFeeTo">Protocol fee recipient (feeTo)</span>: <span class="addr" id="adminFeeToVal">—</span></p>
-    <div class="panel"><label data-i18n="adminNew">New feeToSetter address</label>
-      <div class="row"><input type="text" id="adminNewAddr" placeholder="0x…" spellcheck="false"></div>
-    </div>
-    <p class="note" data-i18n="adminNote">This only hands over the right to set the protocol fee in future. The fee recipient stays unset and no funds move. One signature from the current feeToSetter wallet.</p>
-    <button class="btn primary big" id="adminTransferBtn" data-i18n="adminBtn">Transfer feeToSetter role</button>
-    <p class="status" id="adminStatus"></p>
-  </section>
   <dialog id="tokDlg">
     <h3 data-i18n="pickToken">Pick a token</h3>
     <div id="tokList"></div>

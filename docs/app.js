@@ -1,16 +1,16 @@
-/* Qom DEX frontend — Uniswap V2 on Qom chain (33303). No backend; all calls go wallet/RPC direct. */
+/* QOM DEX frontend — Uniswap V2 on QOM chain (33303). No backend; all calls go wallet/RPC direct. */
 "use strict";
 const CFG = window.DEX_CONFIG;
 const $ = id => document.getElementById(id);
 const ERC20_ABI = ["function symbol() view returns (string)","function decimals() view returns (uint8)","function balanceOf(address) view returns (uint256)","function allowance(address,address) view returns (uint256)","function approve(address,uint256) returns (bool)","function transfer(address,uint256) returns (bool)"];
-const ROUTER_ABI = ["function getAmountsOut(uint256,address[]) view returns (uint256[])","function swapExactETHForTokens(uint256,address[],address,uint256) payable returns (uint256[])","function swapExactTokensForETH(uint256,uint256,address[],address,uint256) returns (uint256[])","function swapExactTokensForTokens(uint256,uint256,address[],address,uint256) returns (uint256[])","function addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256) returns (uint256,uint256,uint256)","function addLiquidityETH(address,uint256,uint256,uint256,address,uint256) payable returns (uint256,uint256,uint256)","function removeLiquidity(address,address,uint256,uint256,uint256,address,uint256) returns (uint256,uint256)","function removeLiquidityETH(address,uint256,uint256,uint256,address,uint256) returns (uint256,uint256)","function factory() view returns (address)","function WETH() view returns (address)"];
-const FACTORY_ABI = ["function getPair(address,address) view returns (address)","function feeTo() view returns (address)","function feeToSetter() view returns (address)","function setFeeToSetter(address)","function allPairsLength() view returns (uint256)","function allPairs(uint256) view returns (address)"];
+const ROUTER_ABI = ["function getAmountsOut(uint256,address[]) view returns (uint256[])","function swapExactETHForTokens(uint256,address[],address,uint256) payable returns (uint256[])","function swapExactTokensForETH(uint256,uint256,address[],address,uint256) returns (uint256[])","function swapExactTokensForTokens(uint256,uint256,address[],address,uint256) returns (uint256[])","function quote(uint256,uint256,uint256) view returns (uint256)","function addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256) returns (uint256,uint256,uint256)","function addLiquidityETH(address,uint256,uint256,uint256,address,uint256) payable returns (uint256,uint256,uint256)","function removeLiquidity(address,address,uint256,uint256,uint256,address,uint256) returns (uint256,uint256)","function removeLiquidityETH(address,uint256,uint256,uint256,address,uint256) returns (uint256,uint256)","function factory() view returns (address)","function WETH() view returns (address)"];
+const FACTORY_ABI = ["function getPair(address,address) view returns (address)","function feeTo() view returns (address)","function feeToSetter() view returns (address)","function allPairsLength() view returns (uint256)","function allPairs(uint256) view returns (address)"];
 const PAIR_ABI = ["function getReserves() view returns (uint112,uint112,uint32)","function balanceOf(address) view returns (uint256)","function allowance(address,address) view returns (uint256)","function approve(address,uint256) returns (bool)","function totalSupply() view returns (uint256)","function token0() view returns (address)","function token1() view returns (address)"];
 const WQOMX_ABI = ["function deposit() payable","function withdraw(uint256)","function balanceOf(address) view returns (uint256)"];
 
 const I18N = {
-  en:{tabSwap:"Swap",tabPool:"Pool",tabWrap:"Wrap",tabDeploy:"Deploy",youPay:"You pay",youReceive:"You receive (estimated)",slippage:"Slippage %",connect:"Connect Wallet",connected:"Connected",wrongNet:"Wrong network — click Connect to switch to Qom (33303).",notDeployed:"The DEX contracts are not configured in this build.",pickToken:"Pick a token",importBtn:"Import",addLiq:"Add liquidity",removeLiq:"Remove liquidity",pairLabel:"Pair (Token A / Token B above)",wrapNote:"QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.",wrapBtn:"Wrap",unwrapBtn:"Unwrap",deployTitle:"Deploy the DEX (one time)",deployNote:"Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.",handoffTitle:"Addresses for Teh Fund / pool creators",copyBtn:"Copy",noPool:"No pool / no liquidity for this pair yet — quote unavailable. Create it in the Pool tab.",quoteOk:(r)=>`Rate ≈ ${r}`,needConnect:"Connect your wallet first.",needDeployed:"Contracts not configured in this build.",working:"Working… check your wallet.",done:(h)=>`Done ✓ tx: ${h}`,failed:(m)=>`Failed: ${m}`,bal:(b,s)=>`Balance: ${b} ${s}`,lpBal:(b)=>`Your LP balance: ${b}`,insufficient:"Amount exceeds your balance / allowance flow failed.",useWrap:"QOMX ⇄ WQOMX is 1:1 — use the Wrap tab, not Swap.",samePair:"Pick two different tokens for a pair.",tag_official:"official ERC-20",poolsTitle:"Pools on this DEX",devNotice:"🚧 The official QOM DEX — contracts deployed by Teh Fund, frontend built by the community. No pools are live yet and the first real swap has not been done. Use at your own risk.",adminTitle:"Factory admin",adminCur:"Current feeToSetter",adminFeeTo:"Protocol fee recipient (feeTo)",feeToUnset:"unset",adminNew:"New feeToSetter address",adminNote:"This only hands over the right to set the protocol fee recipient in future. No funds move. One signature from the current feeToSetter wallet.",adminBtn:"Transfer feeToSetter role",adminDone:"Done. The new feeToSetter is now:",adminBadAddr:"That address is not valid.",poolsNone:"No pools yet — create the first one above.",openInMM:"Open this page in MetaMask",noWallet:"No wallet found in this browser. Open this page inside MetaMask (or install MetaMask), then tap Connect Wallet.",tag_wrapped:"wrapped",tag_native:"via WQOMX",qomxNote:"QOMX in the list is the official ERC-20 contract (0xD494…0517): its balance IS your native QOMX balance — the same coins, spendable directly. WQOMX is a separate wrapped token — wrap and unwrap 1:1 any time in the Wrap tab.",quoteFail:"Could not fetch a quote — the chain / RPC may be unreachable. This is NOT the same as 'no pool': please wait a moment and retry.",readWarn:"⚠️ Some data could not be loaded (RPC read failure). Balances and pool information shown may be out of date — reload the page to retry.",priceMoved:(a,b)=>`Price moved since the quote you saw: expected ≈ ${a}, now ≈ ${b}. The swap was cancelled BEFORE signing and the quote has been refreshed — review it and try again.`,slipHigh:"⚠️ High slippage: with this setting you may receive much less than the quoted amount.",slipCap:(cap)=>`Slippage is capped at ${cap}% for safety — your input was adjusted to ${cap}%.`,insufficientBal:(s)=>`Insufficient ${s} balance for this amount.`,symbolCaution:(s)=>`⚠️ Caution: the symbol "${s}" is reported by this token's own contract — any contract can call itself QOMX or WQOMX. The symbol is NOT verified; double-check the contract address.`},
-  ja:{tabSwap:"スワップ",tabPool:"プール",tabWrap:"ラップ",tabDeploy:"デプロイ",youPay:"支払う",youReceive:"受け取る（見込み）",slippage:"スリッページ %",connect:"ウォレット接続",connected:"接続済み",wrongNet:"ネットワークが違います —「ウォレット接続」から Qom (33303) に切り替えてください。",notDeployed:"DEXコントラクトがこのビルドに設定されていません。",pickToken:"トークンを選ぶ",importBtn:"追加",addLiq:"流動性を追加",removeLiq:"流動性を削除",pairLabel:"ペア（上の Token A / Token B）",wrapNote:"QOMX ⇄ WQOMX は常に 1:1。WQOMX は DEX で使う QOMX の ERC-20 版です。",wrapBtn:"ラップ",unwrapBtn:"アンラップ",deployTitle:"DEXをデプロイ（初回のみ）",deployNote:"あなたのウォレットから WQOMX → Factory → Router02 の順にデプロイします。各ステップであなたが署名し、鍵は誰にも渡りません。feeTo は未設定（プロトコル手数料OFF）、feeToSetter はあなたのアドレスです。ガス見積もり合計 ≈ 850万 gas — 現在のガス価格では約460 QOMX になるため、デプロイ用ウォレットには 600 QOMX 以上を用意してください。",handoffTitle:"Teh Fund / プール作成者向けアドレス一覧",copyBtn:"コピー",noPool:"このペアのプール／流動性がまだ無いため見積もりできません。「プール」タブで作成できます。",quoteOk:(r)=>`レート ≈ ${r}`,needConnect:"先にウォレットを接続してください。",needDeployed:"コントラクトがこのビルドに設定されていません。",working:"処理中… ウォレットを確認してください。",done:(h)=>`完了 ✓ tx: ${h}`,failed:(m)=>`失敗: ${m}`,bal:(b,s)=>`残高: ${b} ${s}`,lpBal:(b)=>`あなたのLP残高: ${b}`,insufficient:"残高不足、または承認フローに失敗しました。",useWrap:"QOMX ⇄ WQOMX は 1:1 です — スワップではなく「ラップ」タブを使ってください。",samePair:"ペアには異なる2つのトークンを選んでください。",tag_official:"公式 ERC-20",poolsTitle:"このDEXのプール",devNotice:"🚧 公式QOM DEX — コントラクトは Teh Fund がデプロイ、フロントエンドはコミュニティが開発しました。プールはまだ開始しておらず、初回の実スワップも未実施です。利用は自己責任でお願いします。",adminTitle:"Factory 管理",adminCur:"現在の feeToSetter",adminFeeTo:"プロトコル手数料の受取先（feeTo）",feeToUnset:"未設定",adminNew:"新しい feeToSetter のアドレス",adminNote:"これは将来プロトコル手数料の受取先を設定できる権限を移すだけです。資金は一切動きません。現在の feeToSetter のウォレットで署名1回です。",adminBtn:"feeToSetter 権限を移転する",adminDone:"完了しました。新しい feeToSetter：",adminBadAddr:"アドレスの形式が正しくありません。",poolsNone:"プールはまだありません — 上で最初のプールを作れます。",openInMM:"MetaMaskでこのページを開く",noWallet:"このブラウザにウォレットが見つかりません。MetaMaskの中でこのページを開く（またはMetaMaskを入れる）→「ウォレット接続」を押してください。",tag_wrapped:"ラップ済み",tag_native:"WQOMX 経由",qomxNote:"リストの QOMX は公式 ERC-20 コントラクト（0xD494…0517）です。残高はネイティブ QOMX の残高そのもの（同じコイン）で、そのまま使えます。WQOMX は別のラップ済みトークンです（「ラップ」タブでいつでも 1:1 で変換できます）。",quoteFail:"見積もりを取得できませんでした（チェーン／RPCに接続できない可能性があります）。これは「プールが無い」とは別の状態です。少し待って再試行してください。",readWarn:"⚠️ 一部のデータを読み取れませんでした（RPC読み取り失敗）。表示中の残高・プール情報が古い可能性があります。ページを再読み込みして再試行してください。",priceMoved:(a,b)=>`表示されていた見積もりから価格が動きました（見込み ≈ ${a} → 現在 ≈ ${b}）。署名の前にスワップを中止し、見積もりを更新しました。内容を確認して再試行してください。`,slipHigh:"⚠️ スリッページが高すぎます。この設定では見積もりより大幅に少なく受け取る可能性があります。",slipCap:(cap)=>`安全のためスリッページの上限は ${cap}% です。入力を ${cap}% に調整しました。`,insufficientBal:(s)=>`${s} の残高が不足しています。`,symbolCaution:(s)=>`⚠️ 注意：シンボル「${s}」はこのトークンのコントラクト自身が名乗っているものです。QOMX や WQOMX のような名前はどのコントラクトでも名乗れます。シンボルは検証されていません — コントラクトアドレスをよく確認してください。`}
+  en:{tabSwap:"Swap",tabPool:"Pool",tabWrap:"Wrap",tabDeploy:"Deploy",youPay:"You pay",youReceive:"You receive (estimated)",slippage:"Slippage %",connect:"Connect Wallet",connected:"Connected",wrongNet:"Wrong network — click Connect to switch to QOM (33303).",notDeployed:"The DEX contracts are not configured in this build.",pickToken:"Pick a token",importBtn:"Import",addLiq:"Add liquidity",removeLiq:"Remove liquidity",pairLabel:"Pair (Token A / Token B above)",wrapBtn:"Wrap",unwrapBtn:"Unwrap",deployTitle:"Deploy the DEX (one time)",deployNote:"Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.",handoffTitle:"Addresses for Teh Fund / pool creators",copyBtn:"Copy",noPool:"No pool / no liquidity for this pair yet — quote unavailable. Create it in the Pool tab.",quoteOk:(r)=>`Rate ≈ ${r}`,needConnect:"Connect your wallet first.",needDeployed:"Contracts not configured in this build.",working:"Working… check your wallet.",done:(h)=>`Done ✓ tx: ${h}`,failed:(m)=>`Failed: ${m}`,bal:(b,s)=>`Balance: ${b} ${s}`,lpBal:(b)=>`Your LP balance: ${b}`,insufficient:"Amount exceeds your balance / allowance flow failed.",useWrap:"QOMX ⇄ WQOMX is always 1:1 and is not traded through a pool — pick a different pair.",samePair:"Pick two different tokens for a pair.",tag_official:"official ERC-20",tag_onqom:"on QOM",maxGas:"MAX (keep gas)",priceImpact:(v)=>`Price impact: ${v}%`,impactHigh:"⚠️ High price impact — this trade moves the price a lot; you may receive much less than the spot value.",minRecv:(v,s)=>`Minimum received: ${v} ${s}`,feeLine:(v,s)=>`Swap fee (0.3%): ${v} ${s}`,tooManyDecimals:(d)=>`Too many decimal places — this token supports ${d} decimals.`,gasKeep:(r)=>`This amount would leave too little for gas — QOMX pays the gas too. Keep at least ≈ ${r} QOMX unspent, or use the MAX button.`,poolShare:(v)=>`Your pool share after adding: ≈ ${v}%`,firstLiq:"No pool yet for this pair — your deposit sets the starting price.",poolsTitle:"Pools on this DEX",devNotice:"🚧 The official QOM DEX — contracts deployed by Teh Fund, frontend built by the community. The Q/QOMX pool is live; liquidity is still thin, so check the price impact before swapping. Use at your own risk.",poolsNone:"No pools yet — create the first one above.",openInMM:"Open this page in MetaMask",noWallet:"No wallet found in this browser. Open this page inside MetaMask (or install MetaMask), then tap Connect Wallet.",tag_wrapped:"wrapped",tag_native:"via WQOMX",qomxNote:"QOMX in the list is the official ERC-20 contract (0xD494…0517): its balance IS your native QOMX balance — the same coins, and QOMX also pays the gas. The live pool uses QOMX (0xD494…) directly; WQOMX is a separate wrapped token with no pool here.",quoteFail:"Could not fetch a quote — the chain / RPC may be unreachable. This is NOT the same as 'no pool': please wait a moment and retry.",readWarn:"⚠️ Some data could not be loaded (RPC read failure). Balances and pool information shown may be out of date — reload the page to retry.",priceMoved:(a,b)=>`Price moved since the quote you saw: expected ≈ ${a}, now ≈ ${b}. The swap was cancelled BEFORE signing and the quote has been refreshed — review it and try again.`,slipHigh:"⚠️ High slippage: with this setting you may receive much less than the quoted amount.",slipCap:(cap)=>`Slippage is capped at ${cap}% for safety — your input was adjusted to ${cap}%.`,insufficientBal:(s)=>`Insufficient ${s} balance for this amount.`,symbolCaution:(s)=>`⚠️ Caution: the symbol "${s}" is reported by this token's own contract — any contract can call itself QOMX or WQOMX. The symbol is NOT verified; double-check the contract address.`},
+  ja:{tabSwap:"スワップ",tabPool:"プール",tabWrap:"ラップ",tabDeploy:"デプロイ",youPay:"支払う",youReceive:"受け取る（見込み）",slippage:"スリッページ %",connect:"ウォレット接続",connected:"接続済み",wrongNet:"ネットワークが違います —「ウォレット接続」から QOM (33303) に切り替えてください。",notDeployed:"DEXコントラクトがこのビルドに設定されていません。",pickToken:"トークンを選ぶ",importBtn:"追加",addLiq:"流動性を追加",removeLiq:"流動性を削除",pairLabel:"ペア（上の Token A / Token B）",wrapBtn:"ラップ",unwrapBtn:"アンラップ",deployTitle:"DEXをデプロイ（初回のみ）",deployNote:"あなたのウォレットから WQOMX → Factory → Router02 の順にデプロイします。各ステップであなたが署名し、鍵は誰にも渡りません。feeTo は未設定（プロトコル手数料OFF）、feeToSetter はあなたのアドレスです。ガス見積もり合計 ≈ 850万 gas — 現在のガス価格では約460 QOMX になるため、デプロイ用ウォレットには 600 QOMX 以上を用意してください。",handoffTitle:"Teh Fund / プール作成者向けアドレス一覧",copyBtn:"コピー",noPool:"このペアのプール／流動性がまだ無いため見積もりできません。「プール」タブで作成できます。",quoteOk:(r)=>`レート ≈ ${r}`,needConnect:"先にウォレットを接続してください。",needDeployed:"コントラクトがこのビルドに設定されていません。",working:"処理中… ウォレットを確認してください。",done:(h)=>`完了 ✓ tx: ${h}`,failed:(m)=>`失敗: ${m}`,bal:(b,s)=>`残高: ${b} ${s}`,lpBal:(b)=>`あなたのLP残高: ${b}`,insufficient:"残高不足、または承認フローに失敗しました。",useWrap:"QOMX ⇄ WQOMX は常に 1:1 で、プールでは取引されません。別のペアを選んでください。",samePair:"ペアには異なる2つのトークンを選んでください。",tag_official:"公式 ERC-20",tag_onqom:"QOM 上",maxGas:"MAX（ガス分を残す）",priceImpact:(v)=>`価格インパクト： ${v}%`,impactHigh:"⚠️ 価格インパクトが大きい取引です。スポット価格より大幅に少なく受け取る可能性があります。",minRecv:(v,s)=>`最低受取額： ${v} ${s}`,feeLine:(v,s)=>`スワップ手数料（0.3%）： ${v} ${s}`,tooManyDecimals:(d)=>`小数桁が多すぎます。このトークンは小数 ${d} 桁までです。`,gasKeep:(r)=>`この金額だとガス分が残りません。ガス代も QOMX から払われます。少なくとも約 ${r} QOMX を残すか、MAX ボタンを使ってください。`,poolShare:(v)=>`追加後のあなたのプールシェア： 約 ${v}%`,firstLiq:"このペアのプールはまだありません — あなたの預け入れが開始価格になります。",poolsTitle:"このDEXのプール",devNotice:"🚧 公式 QOM DEX — コントラクトは Teh Fund がデプロイ、フロントエンドはコミュニティが開発しました。Q/QOMX プールは稼働中です。流動性はまだ薄いため、スワップ前に価格インパクトを確認してください。利用は自己責任でお願いします。",poolsNone:"プールはまだありません — 上で最初のプールを作れます。",openInMM:"MetaMaskでこのページを開く",noWallet:"このブラウザにウォレットが見つかりません。MetaMaskの中でこのページを開く（またはMetaMaskを入れる）→「ウォレット接続」を押してください。",tag_wrapped:"ラップ済み",tag_native:"WQOMX 経由",qomxNote:"リストの QOMX は公式 ERC-20 コントラクト（0xD494…0517）です。残高はネイティブ QOMX の残高そのもの（同じコイン）で、ガス代もこの QOMX から払われます。稼働中のプールは QOMX（0xD494…）を直接使っており、WQOMX は別のラップ済みトークンで、ここにはプールがありません。",quoteFail:"見積もりを取得できませんでした（チェーン／RPCに接続できない可能性があります）。これは「プールが無い」とは別の状態です。少し待って再試行してください。",readWarn:"⚠️ 一部のデータを読み取れませんでした（RPC読み取り失敗）。表示中の残高・プール情報が古い可能性があります。ページを再読み込みして再試行してください。",priceMoved:(a,b)=>`表示されていた見積もりから価格が動きました（見込み ≈ ${a} → 現在 ≈ ${b}）。署名の前にスワップを中止し、見積もりを更新しました。内容を確認して再試行してください。`,slipHigh:"⚠️ スリッページが高すぎます。この設定では見積もりより大幅に少なく受け取る可能性があります。",slipCap:(cap)=>`安全のためスリッページの上限は ${cap}% です。入力を ${cap}% に調整しました。`,insufficientBal:(s)=>`${s} の残高が不足しています。`,symbolCaution:(s)=>`⚠️ 注意：シンボル「${s}」はこのトークンのコントラクト自身が名乗っているものです。QOMX や WQOMX のような名前はどのコントラクトでも名乗れます。シンボルは検証されていません — コントラクトアドレスをよく確認してください。`}
 };
 let lang = localStorage.getItem("qomdex-lang") || "en";
 const t = k => I18N[lang][k];
@@ -35,9 +35,11 @@ let customTokens = safeParse(localStorage.getItem("qomdex-tokens") || "[]", []);
 function tokenList(){
   const list = [];
   if(CFG.qomxErc20) list.push({symbol:"QOMX", address:CFG.qomxErc20, decimals:18, tag:"official"});
+  if(CFG.qToken) list.push({symbol:"Q", label:"Q (on QOM)", address:CFG.qToken, decimals:6, tag:"onqom"});
   if(addrs.wqomx) list.push({symbol:"WQOMX", address:addrs.wqomx, decimals:18, tag:"wrapped"});
   return list.concat(customTokens.filter(ct => !list.some(x=>x.address.toLowerCase()===ct.address.toLowerCase())));
 }
+const tokLabel = tok => tok.label || tok.symbol;
 let swapIn = tokenList()[0], swapOut = tokenList()[1] || tokenList()[0];
 let liqA = tokenList()[0], liqB = tokenList()[1] || tokenList()[0];
 
@@ -68,7 +70,7 @@ function refreshDeployedUI(){
   $("notDeployed").hidden = deployed();
   if(!deployed()) $("notDeployed").textContent = t("notDeployed");
   const dis = !deployed();
-  $("swapBtn").disabled = dis; $("liqBtn").disabled = dis; $("liqRemoveBtn").disabled = dis; $("wrapBtn").disabled = dis || !addrs.wqomx; $("unwrapBtn").disabled = dis || !addrs.wqomx;
+  $("swapBtn").disabled = dis; $("liqBtn").disabled = dis; $("liqRemoveBtn").disabled = dis;
   renderTokButtons();
 }
 function applyLang(){
@@ -80,7 +82,7 @@ function applyLang(){
 $("langBtn").onclick = ()=>{ lang = lang==="en"?"ja":"en"; localStorage.setItem("qomdex-lang", lang); applyLang(); };
 $("themeBtn").onclick = ()=>{ const d = document.documentElement.dataset.theme==="dark"; document.documentElement.dataset.theme = d?"":"dark"; localStorage.setItem("guppy-theme", d?"light":"dark"); $("themeBtn").textContent = d?"🌙 Dark":"☀️ Light"; };
 
-document.querySelectorAll(".tab").forEach(b=> b.onclick = ()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); b.classList.add("active"); ["swap","pool","wrap"].forEach(k=> $("tab-"+k).hidden = k!==b.dataset.tab); });
+document.querySelectorAll(".tab").forEach(b=> b.onclick = ()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); b.classList.add("active"); ["swap","pool"].forEach(k=> $("tab-"+k).hidden = k!==b.dataset.tab); });
 
 async function connect(){
   if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); showMmOpen(); return; }
@@ -109,16 +111,18 @@ async function connect(){
   if(Number(net.chainId) !== CFG.chainId){ $("netNotice").hidden=false; $("netNotice").textContent = t("wrongNet"); return; }
   signer = await provider.getSigner(); account = await signer.getAddress();
   $("connectBtn").textContent = t("connected")+": "+account.slice(0,6)+"…"+account.slice(-4);
-  refreshDeployedUI(); refreshBalances(); quoteSwap(); refreshLp(); checkAdmin();
+  refreshDeployedUI(); refreshBalances(); quoteSwap(); refreshLp(); updateMaxBtn();
 }
 $("connectBtn").onclick = ()=> connect().catch(e=>{ $("netNotice").hidden=false; $("netNotice").textContent = t("failed")(e.shortMessage||e.message); });
 
 function renderTokButtons(){
-  $("swapInTok").textContent = swapIn.symbol+" ▾"; $("swapOutTok").textContent = swapOut.symbol+" ▾";
-  $("liqATok").textContent = liqA.symbol+" ▾"; $("liqBTok").textContent = liqB.symbol+" ▾";
+  $("swapInTok").textContent = tokLabel(swapIn)+" ▾"; $("swapOutTok").textContent = tokLabel(swapOut)+" ▾";
+  $("liqATok").textContent = tokLabel(liqA)+" ▾"; $("liqBTok").textContent = tokLabel(liqB)+" ▾";
+  updateMaxBtn();
 }
+function updateMaxBtn(){ const b = $("swapInMax"); if(!b) return; b.hidden = !(account && CFG.qomxErc20 && swapIn.address.toLowerCase() === CFG.qomxErc20.toLowerCase()); }
 let pickerTarget = null;
-function openPicker(setter){ pickerTarget = setter; const list=$("tokList"); list.innerHTML=""; tokenList().forEach(tok=>{ const b=document.createElement("button"); b.className="tok-btn"; b.textContent=`${tok.symbol}${tok.tag?" ("+t("tag_"+tok.tag)+")":""} — ${tok.address==="native"?"native":tok.address.slice(0,10)+"…"}`; b.onclick=()=>{ setter(tok); $("tokDlg").close(); renderTokButtons(); quoteSwap(); refreshBalances(); refreshLp(); }; list.appendChild(b); }); $("tokDlg").showModal(); }
+function openPicker(setter){ pickerTarget = setter; const list=$("tokList"); list.innerHTML=""; tokenList().forEach(tok=>{ const b=document.createElement("button"); b.className="tok-btn"; b.textContent=`${tokLabel(tok)}${tok.tag && !tok.label?" ("+t("tag_"+tok.tag)+")":""} — ${tok.address==="native"?"native":tok.address.slice(0,10)+"…"}`; b.onclick=()=>{ setter(tok); $("tokDlg").close(); renderTokButtons(); quoteSwap(); refreshBalances(); refreshLp(); updateLiqInfo(); }; list.appendChild(b); }); $("tokDlg").showModal(); }
 $("swapInTok").onclick=()=>openPicker(v=>swapIn=v); $("swapOutTok").onclick=()=>openPicker(v=>swapOut=v);
 $("liqATok").onclick=()=>openPicker(v=>liqA=v); $("liqBTok").onclick=()=>openPicker(v=>liqB=v);
 $("tokClose").onclick=()=>$("tokDlg").close();
@@ -151,14 +155,19 @@ async function refreshBalances(){
 }
 let quoteSeq = 0;
 let shownQuote = null; // the quote currently on screen: {key, outRaw} — doSwap binds the send to THIS (M-2)
+function decOverflow(str, dec){ const parts = String(str).split("."); if(parts.length < 2) return false; return parts[1].replace(/0+$/, "").length > dec; }
+function clearSwapDetails(){ for(const id of ["swapImpact","swapMinRecv","swapFee"]){ const el = $(id); if(el){ el.textContent = ""; el.className = "quote"; } } }
 async function quoteSwap(){
   const seq = ++quoteSeq;
-  const amt = $("swapInAmt").value; $("swapQuote").textContent=""; $("swapOutAmt").value=""; shownQuote = null;
+  const amt = $("swapInAmt").value; $("swapQuote").textContent=""; $("swapOutAmt").value=""; shownQuote = null; clearSwapDetails();
   if(!deployed() || !amt || Number(amt)<=0 || swapIn.address===swapOut.address) return;
+  if(decOverflow(amt, swapIn.decimals)){ $("swapQuote").textContent = t("tooManyDecimals")(swapIn.decimals); $("swapBtn").disabled = true; return; }
   const aIn = effAddr(swapIn).toLowerCase(), aOut = effAddr(swapOut).toLowerCase();
   const wrapPair = (aIn===CFG.qomxErc20.toLowerCase() && aOut===addrs.wqomx.toLowerCase()) || (aOut===CFG.qomxErc20.toLowerCase() && aIn===addrs.wqomx.toLowerCase());
   if(effAddr(swapIn)===effAddr(swapOut) || wrapPair){ $("swapQuote").textContent = t("useWrap"); $("swapBtn").disabled = true; return; }
-  const amtInRaw = ethers.parseUnits(amt, swapIn.decimals);
+  let amtInRaw;
+  try{ amtInRaw = ethers.parseUnits(amt, swapIn.decimals); }
+  catch(e){ $("swapQuote").textContent = t("tooManyDecimals")(swapIn.decimals); $("swapBtn").disabled = true; return; }
   try{
     // L-1: check pair existence first so "no pool" is not confused with an
     // RPC/read failure (previously every error was reported as "no pool").
@@ -172,6 +181,26 @@ async function quoteSwap(){
     $("swapOutAmt").value = fmt(ethers.formatUnits(amounts[1], swapOut.decimals));
     $("swapQuote").textContent = t("quoteOk")(`1 ${swapIn.symbol} = ${fmt(Number(ethers.formatUnits(amounts[1],swapOut.decimals))/Number(amt))} ${swapOut.symbol}`);
     shownQuote = { key: aIn+"|"+aOut+"|"+amtInRaw.toString(), outRaw: amounts[1] };
+    // Price impact vs the pool's spot price, the guaranteed minimum at the
+    // current slippage setting, and the 0.3% swap fee — all derived from the
+    // SAME displayed quote the send is bound to (M-2), so they cannot drift
+    // apart from what doSwap will enforce.
+    try{
+      const pc = new ethers.Contract(pair, PAIR_ABI, readProvider);
+      const [t0, res] = await Promise.all([pc.token0(), pc.getReserves()]);
+      if(seq === quoteSeq){
+        const inIs0 = effAddr(swapIn).toLowerCase() === t0.toLowerCase();
+        const rIn = inIs0 ? res[0] : res[1], rOut = inIs0 ? res[1] : res[0];
+        const spot = Number(ethers.formatUnits(rOut, swapOut.decimals)) / Number(ethers.formatUnits(rIn, swapIn.decimals));
+        const eff = Number(ethers.formatUnits(amounts[1], swapOut.decimals)) / Number(amt);
+        const impact = Math.max(0, (1 - eff / spot) * 100);
+        const impEl = $("swapImpact");
+        impEl.textContent = t("priceImpact")(impact < 0.005 ? "≈0" : impact.toFixed(2)) + (impact > 3 ? " — " + t("impactHigh") : "");
+        impEl.className = "quote" + (impact > 10 ? " impact-bad" : impact > 3 ? " impact-warn" : "");
+        $("swapMinRecv").textContent = t("minRecv")(fmt(ethers.formatUnits(minOut(amounts[1], $("slippage").value || 0.5), swapOut.decimals)), swapOut.symbol);
+        $("swapFee").textContent = t("feeLine")(fmt(Number(amt) * 0.003), swapIn.symbol);
+      }
+    }catch(e){ /* details are best-effort; the quote itself already stands */ }
     $("swapBtn").disabled = !account;
   }catch(e){
     if(seq !== quoteSeq) return;
@@ -184,6 +213,35 @@ async function quoteSwap(){
   }
 }
 $("swapInAmt").addEventListener("input", quoteSwap);
+// The QOMX in the list IS the native balance (0xD494 precompile), so gas is
+// paid from the same coins being swapped. MAX therefore leaves a gas
+// reserve: live swap-gas estimate x1.2 x gas price.
+async function gasReserveWei(estGas){
+  const fd = await readProvider.getFeeData();
+  const gp = fd.gasPrice || 0n;
+  return (estGas * 120n / 100n) * gp;
+}
+$("swapInMax").onclick = async ()=>{
+  if(!account) return;
+  const st = $("swapStatus");
+  try{
+    const bal = await readProvider.getBalance(account);
+    let est = 220000n; // fallback if the swap cannot be estimated yet (e.g. no amount typed)
+    try{
+      const r = new ethers.Contract(addrs.router, ROUTER_ABI, signer);
+      const probe = bal / 2n > 0n ? bal / 2n : bal;
+      est = await r.swapExactTokensForTokens.estimateGas(probe, 0n, [effAddr(swapIn), effAddr(swapOut)], account, deadline());
+      const c = new ethers.Contract(swapIn.address, ERC20_ABI, readProvider);
+      if(await c.allowance(account, addrs.router) < probe) est += 60000n; // first swap also pays the approve
+    }catch(e){ /* keep fallback */ }
+    const reserve = await gasReserveWei(est);
+    const maxAmt = bal > reserve ? bal - reserve : 0n;
+    if(maxAmt <= 0n){ st.textContent = t("insufficient"); return; }
+    $("swapInAmt").value = ethers.formatUnits(maxAmt, swapIn.decimals);
+    st.textContent = "";
+    quoteSwap();
+  }catch(e){ st.textContent = t("failed")(e.shortMessage || e.message); }
+};
 // L-2: visible warning for high slippage, and a labelled hard cap instead of
 // the old silent 50% clamp inside minOut.
 function checkSlippage(){
@@ -194,18 +252,27 @@ function checkSlippage(){
   else el.textContent = "";
 }
 $("slippage").addEventListener("input", checkSlippage);
-$("slippage").addEventListener("change", checkSlippage);
+$("slippage").addEventListener("change", ()=>{ checkSlippage(); quoteSwap(); });
 
+// Gas: every send sets gasLimit to exactly the estimate x1.2. The wallet's
+// own estimate on this chain leaves no headroom, but padding further is
+// wasteful because QOM charges at least 50% of the gas LIMIT per tx.
+async function sendGas(fn, args, overrides){
+  const ov = overrides || {};
+  const est = await fn.estimateGas(...args, ov);
+  return fn(...args, {...ov, gasLimit: est * 120n / 100n});
+}
 async function ensureApprove(tokAddr, spender, amount, statusEl){
   const c = new ethers.Contract(tokAddr, ERC20_ABI, signer);
   const al = await c.allowance(account, spender);
-  if(al < amount){ statusEl.textContent = t("working"); const tx = await c.approve(spender, amount); await tx.wait(); }
+  if(al < amount){ statusEl.textContent = t("working"); const tx = await sendGas(c.approve, [spender, amount]); await tx.wait(); }
 }
 async function doSwap(){
   const st=$("swapStatus"); if(!account){ st.textContent=t("needConnect"); return; } if(!deployed()){ st.textContent=t("needDeployed"); return; }
   try{
     st.textContent=t("working");
     if(effAddr(swapIn)===effAddr(swapOut)){ st.textContent = t("useWrap"); return; }
+    if(decOverflow($("swapInAmt").value, swapIn.decimals)){ st.textContent = t("tooManyDecimals")(swapIn.decimals); return; }
     const amtIn = ethers.parseUnits($("swapInAmt").value, swapIn.decimals);
     if(amtIn <= 0n){ st.textContent = t("insufficient"); return; }
     const balIn = await balOf(swapIn, account); if(balIn !== null && balIn < amtIn){ st.textContent = t("insufficient"); return; }
@@ -227,9 +294,21 @@ async function doSwap(){
     }
     const outMin = minOut(shown !== null ? shown : amounts[1], slip);
     let tx;
-    if(swapIn.address==="native") tx = await router.swapExactETHForTokens(outMin, [addrs.wqomx, effAddr(swapOut)], account, deadline(), {value: amtIn});
-    else if(swapOut.address==="native"){ await ensureApprove(swapIn.address, addrs.router, amtIn, st); tx = await router.swapExactTokensForETH(amtIn, outMin, [swapIn.address, addrs.wqomx], account, deadline()); }
-    else { await ensureApprove(swapIn.address, addrs.router, amtIn, st); tx = await router.swapExactTokensForTokens(amtIn, outMin, [swapIn.address, swapOut.address], account, deadline()); }
+    if(swapIn.address==="native") tx = await sendGas(router.swapExactETHForTokens, [outMin, [addrs.wqomx, effAddr(swapOut)], account, deadline()], {value: amtIn});
+    else if(swapOut.address==="native"){ await ensureApprove(swapIn.address, addrs.router, amtIn, st); tx = await sendGas(router.swapExactTokensForETH, [amtIn, outMin, [swapIn.address, addrs.wqomx], account, deadline()]); }
+    else {
+      await ensureApprove(swapIn.address, addrs.router, amtIn, st);
+      // Gas guard: when the input is QOMX (the native-balance token), the
+      // gas is paid from the very balance being swapped. Refuse a send that
+      // would leave too little behind to pay for itself.
+      if(swapIn.address.toLowerCase() === String(CFG.qomxErc20||"").toLowerCase()){
+        const est = await router.swapExactTokensForTokens.estimateGas(amtIn, outMin, [swapIn.address, swapOut.address], account, deadline());
+        const reserve = await gasReserveWei(est);
+        const nativeBal = await readProvider.getBalance(account);
+        if(amtIn + reserve > nativeBal){ st.textContent = t("gasKeep")(fmt(ethers.formatEther(reserve))); return; }
+      }
+      tx = await sendGas(router.swapExactTokensForTokens, [amtIn, outMin, [swapIn.address, swapOut.address], account, deadline()]);
+    }
     const r = await tx.wait(); st.textContent = t("done")(r.hash); refreshBalances(); quoteSwap();
   }catch(e){ st.textContent = t("failed")(e.shortMessage||e.message); }
 }
@@ -268,6 +347,7 @@ async function doAddLiq(){
   try{
     st.textContent=t("working");
     if(effAddr(liqA)===effAddr(liqB)){ st.textContent = t("samePair"); return; }
+    if(decOverflow($("liqAAmt").value, liqA.decimals) || decOverflow($("liqBAmt").value, liqB.decimals)){ st.textContent = t("tooManyDecimals")(decOverflow($("liqAAmt").value, liqA.decimals) ? liqA.decimals : liqB.decimals); return; }
     const aAmt=ethers.parseUnits($("liqAAmt").value, liqA.decimals), bAmt=ethers.parseUnits($("liqBAmt").value, liqB.decimals);
     if(aAmt <= 0n || bAmt <= 0n){ st.textContent = t("insufficient"); return; }
     // L-5: same pre-send balance check the swap path has (was missing here —
@@ -279,16 +359,69 @@ async function doAddLiq(){
     if(liqA.address==="native"||liqB.address==="native"){
       const tok = liqA.address==="native"? liqB: liqA; const tokAmt = liqA.address==="native"? bAmt: aAmt; const ethAmt = liqA.address==="native"? aAmt: bAmt;
       await ensureApprove(tok.address, addrs.router, tokAmt, st);
-      tx = await router.addLiquidityETH(tok.address, tokAmt, minOut(tokAmt,slip), minOut(ethAmt,slip), account, deadline(), {value: ethAmt});
+      tx = await sendGas(router.addLiquidityETH, [tok.address, tokAmt, minOut(tokAmt,slip), minOut(ethAmt,slip), account, deadline()], {value: ethAmt});
     } else {
       await ensureApprove(liqA.address, addrs.router, aAmt, st); await ensureApprove(liqB.address, addrs.router, bAmt, st);
-      tx = await router.addLiquidity(liqA.address, liqB.address, aAmt, bAmt, minOut(aAmt,slip), minOut(bAmt,slip), account, deadline());
+      tx = await sendGas(router.addLiquidity, [liqA.address, liqB.address, aAmt, bAmt, minOut(aAmt,slip), minOut(bAmt,slip), account, deadline()]);
     }
     const r=await tx.wait(); st.textContent=t("done")(r.hash); refreshLp();
   }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); }
 }
 $("liqBtn").onclick = doAddLiq;
-$("liqAAmt").addEventListener("input", refreshLp); $("liqBAmt").addEventListener("input", refreshLp);
+// Ratio auto-fill: typing one side fills the other at the pool's current
+// ratio (Router.quote), so an add cannot fail on a mismatched second amount
+// after the approve gas is spent. Also shows the resulting pool share.
+let liqSeq = 0, liqTimer = null;
+async function liqReserves(){
+  const f = new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider);
+  const pair = await f.getPair(effAddr(liqA), effAddr(liqB));
+  if(pair === ethers.ZeroAddress) return null;
+  const pc = new ethers.Contract(pair, PAIR_ABI, readProvider);
+  const [t0, res, ts] = await Promise.all([pc.token0(), pc.getReserves(), pc.totalSupply()]);
+  const aIs0 = effAddr(liqA).toLowerCase() === t0.toLowerCase();
+  return { pair, resA: aIs0 ? res[0] : res[1], resB: aIs0 ? res[1] : res[0], ts };
+}
+async function updateLiqInfo(changed){
+  const seq = ++liqSeq;
+  const el = $("liqQuote"); if(!el) return;
+  let info = null;
+  try{ info = await liqReserves(); }catch(e){ info = null; }
+  if(seq !== liqSeq) return;
+  if(!info){ el.textContent = (liqAAmtVal() || liqBAmtVal()) ? t("firstLiq") : ""; return; }
+  // auto-fill the side that was not just edited
+  try{
+    const router = new ethers.Contract(addrs.router, ROUTER_ABI, readProvider);
+    if(changed === "A" && liqAAmtVal()){
+      if(!decOverflow(liqAAmtVal(), liqA.decimals)){
+        const aRaw = ethers.parseUnits(liqAAmtVal(), liqA.decimals);
+        const bRaw = await router.quote(aRaw, info.resA, info.resB);
+        if(seq === liqSeq) $("liqBAmt").value = ethers.formatUnits(bRaw, liqB.decimals);
+      }
+    } else if(changed === "B" && liqBAmtVal()){
+      if(!decOverflow(liqBAmtVal(), liqB.decimals)){
+        const bRaw = ethers.parseUnits(liqBAmtVal(), liqB.decimals);
+        const aRaw = await router.quote(bRaw, info.resB, info.resA);
+        if(seq === liqSeq) $("liqAAmt").value = ethers.formatUnits(aRaw, liqA.decimals);
+      }
+    }
+  }catch(e){ /* ratio fill is best-effort */ }
+  // pool share from the (possibly just filled) amounts
+  try{
+    const aRaw = liqAAmtVal() && !decOverflow(liqAAmtVal(), liqA.decimals) ? ethers.parseUnits(liqAAmtVal(), liqA.decimals) : 0n;
+    const bRaw = liqBAmtVal() && !decOverflow(liqBAmtVal(), liqB.decimals) ? ethers.parseUnits(liqBAmtVal(), liqB.decimals) : 0n;
+    if(aRaw > 0n && bRaw > 0n && info.resA > 0n && info.resB > 0n && info.ts > 0n){
+      const liqFromA = aRaw * info.ts / info.resA, liqFromB = bRaw * info.ts / info.resB;
+      const liq = liqFromA < liqFromB ? liqFromA : liqFromB;
+      const share = Number(liq * 1000000n / (info.ts + liq)) / 10000;
+      el.textContent = t("poolShare")(share < 0.01 ? "<0.01" : share.toFixed(2));
+    } else el.textContent = "";
+  }catch(e){ el.textContent = ""; }
+}
+function liqAAmtVal(){ return $("liqAAmt").value; }
+function liqBAmtVal(){ return $("liqBAmt").value; }
+function scheduleLiq(changed){ clearTimeout(liqTimer); liqTimer = setTimeout(()=>updateLiqInfo(changed), 350); }
+$("liqAAmt").addEventListener("input", ()=>{ refreshLp(); scheduleLiq("A"); });
+$("liqBAmt").addEventListener("input", ()=>{ refreshLp(); scheduleLiq("B"); });
 async function doRemoveLiq(){
   const st=$("liqRemoveStatus"); if(!account){ st.textContent=t("needConnect"); return; }
   try{
@@ -299,7 +432,7 @@ async function doRemoveLiq(){
     let pct = Math.floor(Number($("liqRemovePct").value||100)); if(!(pct>=1)) pct = 1; if(pct>100) pct = 100;
     const amt = bal * BigInt(pct) / 100n;
     if(amt <= 0n){ st.textContent = t("insufficient"); return; }
-    const al=await pair.allowance(account, addrs.router); if(al<amt){ const txa=await pair.approve(addrs.router, amt); await txa.wait(); }
+    const al=await pair.allowance(account, addrs.router); if(al<amt){ const txa=await sendGas(pair.approve, [addrs.router, amt]); await txa.wait(); }
     // slippage-protected minimums from the pair's live reserves and total supply
     const [res, ts, t0] = await Promise.all([pair.getReserves(), pair.totalSupply(), pair.token0()]);
     const exp0 = amt * res[0] / ts, exp1 = amt * res[1] / ts;
@@ -308,44 +441,11 @@ async function doRemoveLiq(){
     const slip = $("slippage").value || 0.5;
     const minA = minOut(expA, slip), minB = minOut(expB, slip);
     const router=new ethers.Contract(addrs.router, ROUTER_ABI, signer); let tx;
-    if(liqA.address==="native"||liqB.address==="native"){ const tok=liqA.address==="native"?liqB:liqA; const minTok = liqA.address==="native"? minB : minA; const minEth = liqA.address==="native"? minA : minB; tx=await router.removeLiquidityETH(tok.address, amt, minTok, minEth, account, deadline()); }
-    else tx=await router.removeLiquidity(liqA.address, liqB.address, amt, minA, minB, account, deadline());
+    if(liqA.address==="native"||liqB.address==="native"){ const tok=liqA.address==="native"?liqB:liqA; const minTok = liqA.address==="native"? minB : minA; const minEth = liqA.address==="native"? minA : minB; tx=await sendGas(router.removeLiquidityETH, [tok.address, amt, minTok, minEth, account, deadline()]); }
+    else tx=await sendGas(router.removeLiquidity, [liqA.address, liqB.address, amt, minA, minB, account, deadline()]);
     const r=await tx.wait(); st.textContent=t("done")(r.hash); refreshLp(); loadPools();
   }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); }
 }
 $("liqRemoveBtn").onclick = doRemoveLiq;
-
-// ---------- Factory admin (visible only to the current feeToSetter) ----------
-async function checkAdmin(){
-  const sec=$("tab-admin"); if(!sec) return;
-  if(!account){ sec.hidden=true; return; }
-  try{
-    const f=new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider);
-    const setter=await f.feeToSetter();
-    if(setter.toLowerCase()!==account.toLowerCase()){ sec.hidden=true; return; }
-    sec.hidden=false;
-    $("adminCurAddr").textContent=setter;
-    const ft=await f.feeTo();
-    $("adminFeeToVal").textContent=(ft===ethers.ZeroAddress)?t("feeToUnset"):ft;
-  }catch(e){ sec.hidden=true; }
-}
-$("adminTransferBtn").onclick=async()=>{
-  const st=$("adminStatus");
-  let target=($("adminNewAddr").value||"").trim();
-  if(!ethers.isAddress(target)){ st.textContent=t("adminBadAddr"); return; }
-  target=ethers.getAddress(target);
-  try{
-    st.textContent=t("working");
-    const f=new ethers.Contract(addrs.factory, FACTORY_ABI, signer);
-    const tx=await f.setFeeToSetter(target);
-    const r=await tx.wait();
-    const now=await new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider).feeToSetter();
-    st.textContent=t("adminDone")+" "+now+" \u00b7 tx: "+r.hash;
-    $("adminCurAddr").textContent=now;
-    if(now.toLowerCase()!==account.toLowerCase()) setTimeout(()=>{ $("tab-admin").hidden=true; }, 5000);
-  }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); }
-};
-$("wrapBtn").onclick = async ()=>{ const st=$("wrapStatus"); if(!account){ st.textContent=t("needConnect"); return; } try{ const v=ethers.parseEther($("wrapAmt").value||"0"); if(v<=0n){ st.textContent=t("insufficient"); return; } st.textContent=t("working"); const w=new ethers.Contract(addrs.wqomx, WQOMX_ABI, signer); const tx=await w.deposit({value: v}); const r=await tx.wait(); st.textContent=t("done")(r.hash); refreshBalances(); }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); } };
-$("unwrapBtn").onclick = async ()=>{ const st=$("wrapStatus"); if(!account){ st.textContent=t("needConnect"); return; } try{ const v=ethers.parseEther($("unwrapAmt").value||"0"); if(v<=0n){ st.textContent=t("insufficient"); return; } st.textContent=t("working"); const w=new ethers.Contract(addrs.wqomx, WQOMX_ABI, signer); const tx=await w.withdraw(v); const r=await tx.wait(); st.textContent=t("done")(r.hash); refreshBalances(); }catch(e){ st.textContent=t("failed")(e.shortMessage||e.message); } };
 
 init();
