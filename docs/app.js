@@ -16,6 +16,7 @@ let lang = localStorage.getItem("qomdex-lang") || "en";
 const t = k => I18N[lang][k];
 
 let readProvider, provider, signer, account = null;
+let ethWired = false;
 // L-1: track which read paths are currently failing so a visible banner can
 // say "displayed data may be stale" instead of silently blanking values.
 const readFailSrc = new Set();
@@ -60,7 +61,7 @@ async function init(){
   readProvider = new ethers.JsonRpcProvider(CFG.rpcUrl, CFG.chainId);
   applyLang(); refreshDeployedUI(); renderTokButtons();
   try{ const n = await readProvider.getNetwork(); console.log("RPC chain", n.chainId.toString()); }catch(e){ $("netNotice").hidden=false; $("netNotice").textContent = "RPC unreachable: "+CFG.rpcUrl; }
-  const wireEth = ()=>{ if(window.ethereum && !provider){ provider = new ethers.BrowserProvider(window.ethereum); window.ethereum.on?.("accountsChanged", ()=>location.reload()); window.ethereum.on?.("chainChanged", ()=>location.reload()); $("mmOpen").hidden = true; } };
+  const wireEth = ()=>{ if(window.ethereum && !ethWired){ ethWired = true; window.ethereum.on?.("accountsChanged", accs => { if(!accs || !accs.length) clearConnectedUI(); else refreshConnection(); }); window.ethereum.on?.("chainChanged", ()=>refreshConnection()); $("mmOpen").hidden = true; tryRestore(); } };
   wireEth();
   window.addEventListener("ethereum#initialized", wireEth, {once:true});
   setTimeout(()=>{ if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); showMmOpen(); } }, 1200);
@@ -84,6 +85,42 @@ $("themeBtn").onclick = ()=>{ const d = document.documentElement.dataset.theme==
 
 document.querySelectorAll(".tab").forEach(b=> b.onclick = ()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); b.classList.add("active"); ["swap","pool"].forEach(k=> $("tab-"+k).hidden = k!==b.dataset.tab); });
 
+// The Connected display is a state, not a one-off label: it is set in one
+// place (setConnectedUI), restored silently on load when the wallet is
+// already authorised (tryRestore), and maintained across account/chain
+// changes WITHOUT a page reload (refreshConnection) — the old reload
+// handlers threw the display back to "Connect Wallet" and lost typed input.
+function setConnectedUI(){
+  $("connectBtn").textContent = t("connected")+": "+account.slice(0,6)+"…"+account.slice(-4);
+  $("netNotice").hidden = true;
+  refreshDeployedUI(); refreshBalances(); quoteSwap(); refreshLp(); updatePctRow();
+}
+function clearConnectedUI(){
+  account = null; signer = null;
+  $("connectBtn").textContent = t("connect");
+  $("swapInBal").textContent = ""; $("swapOutBal").textContent = ""; $("lpBal").textContent = "";
+  updatePctRow();
+}
+async function tryRestore(){
+  if(!window.ethereum || account) return;
+  try{
+    const accs = await window.ethereum.request({method:"eth_accounts"});
+    if(!accs || !accs.length) return;
+    const cid = await window.ethereum.request({method:"eth_chainId"});
+    if(parseInt(cid, 16) !== CFG.chainId) return; // wrong chain: the Connect button runs the switch flow
+    provider = new ethers.BrowserProvider(window.ethereum);
+    signer = await provider.getSigner(); account = await signer.getAddress();
+    setConnectedUI();
+  }catch(e){ /* best-effort: a failed restore just leaves the Connect button */ }
+}
+async function refreshConnection(){
+  account = null; signer = null;
+  await tryRestore();
+  if(!account){
+    clearConnectedUI();
+    try{ const accs = await window.ethereum.request({method:"eth_accounts"}); if(accs && accs.length){ $("netNotice").hidden=false; $("netNotice").textContent = t("wrongNet"); } }catch(e){}
+  }
+}
 async function connect(){
   if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); showMmOpen(); return; }
   // Request accounts FIRST, explicitly: eth_requestAccounts is the call that
@@ -94,7 +131,6 @@ async function connect(){
   // switch also means the confirmation is never blocked behind a switch/add
   // failure on wallets whose switch handling is flaky.
   await window.ethereum.request({method:"eth_requestAccounts"});
-  provider = new ethers.BrowserProvider(window.ethereum);
   const hexId = "0x"+CFG.chainId.toString(16);
   const addParams = [{chainId:hexId, chainName:CFG.chainName, nativeCurrency:{name:"QOMX",symbol:"QOMX",decimals:18}, rpcUrls:[CFG.rpcUrl], blockExplorerUrls:[CFG.explorer]}];
   // MetaMask mobile wraps the 4902 "chain not added" error so ethers shows
@@ -107,11 +143,16 @@ async function connect(){
     await window.ethereum.request({method:"wallet_addEthereumChain", params:addParams});
     await window.ethereum.request({method:"wallet_switchEthereumChain", params:[{chainId:hexId}]});
   }
-  const net = await provider.getNetwork();
-  if(Number(net.chainId) !== CFG.chainId){ $("netNotice").hidden=false; $("netNotice").textContent = t("wrongNet"); return; }
+  // Build the ethers provider only AFTER the switch settles, and verify the
+  // chain from the raw provider first: a BrowserProvider created before the
+  // switch can keep reporting the pre-switch network on mobile wallets,
+  // which made a successful switch look like a failure — the button then
+  // never settled into the Connected state.
+  const cid = await window.ethereum.request({method:"eth_chainId"});
+  if(parseInt(cid, 16) !== CFG.chainId){ $("netNotice").hidden=false; $("netNotice").textContent = t("wrongNet"); return; }
+  provider = new ethers.BrowserProvider(window.ethereum);
   signer = await provider.getSigner(); account = await signer.getAddress();
-  $("connectBtn").textContent = t("connected")+": "+account.slice(0,6)+"…"+account.slice(-4);
-  refreshDeployedUI(); refreshBalances(); quoteSwap(); refreshLp(); updatePctRow();
+  setConnectedUI();
 }
 $("connectBtn").onclick = ()=> connect().catch(e=>{ $("netNotice").hidden=false; $("netNotice").textContent = t("failed")(e.shortMessage||e.message); });
 
