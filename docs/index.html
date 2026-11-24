@@ -113,6 +113,15 @@
 
   <!-- Token picker -->
 
+  <dialog id="connDlg">
+    <h3 data-i18n="connectedTitle">Wallet connected</h3>
+    <p class="quote" id="connAddr">—</p>
+    <div class="row">
+      <button id="disconnectBtn" class="btn danger" data-i18n="disconnectBtn">Disconnect</button>
+      <button id="connClose" class="btn small">✕</button>
+    </div>
+  </dialog>
+
   <dialog id="tokDlg">
     <h3 data-i18n="pickToken">Pick a token</h3>
     <div id="tokList"></div>
