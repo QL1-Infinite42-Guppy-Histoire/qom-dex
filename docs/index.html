@@ -29,6 +29,7 @@
   <p class="notice warn" data-i18n="devNotice">🚧 The official QOM DEX — contracts deployed by Teh Fund, frontend built by the community. No pools are live yet and the first real swap has not been done. Use at your own risk.</p>
   <p id="notDeployed" class="notice" hidden></p>
   <p id="netNotice" class="notice warn" hidden></p>
+  <p id="readWarn" class="notice warn" hidden></p>
   <p id="mmOpen" class="notice" hidden><a id="mmOpenLink" href="https://metamask.app.link/dapp/ql1-infinite42-guppy-histoire.github.io/qom-dex/" target="_blank" rel="noopener" data-i18n="openInMM">Open in MetaMask</a></p>
 
   <nav class="tabs">
@@ -61,6 +62,7 @@
       <label data-i18n="slippage">Slippage %</label>
       <input id="slippage" type="number" value="0.5" step="0.1" min="0" class="mini">
     </div>
+    <p class="status warn" id="slipWarn"></p>
     <p class="quote" id="swapQuote"></p>
     <button id="swapBtn" class="btn primary big" disabled>Swap</button>
     <p class="status" id="swapStatus"></p>

@@ -82,3 +82,27 @@ routes to Wrap guidance; remove-liquidity slippage minimums from live reserves
 (was 0/0) + pair/zero guards; pool list per-token decimals; custom-token import
 validation/dedupe; localStorage parse hardening; stale admin prefill removed.
 Contracts themselves are immutable and were not touched.
+
+## Audit fixes 2026-11-24 (official DEX frontend; contracts untouched)
+Full audit of the official contracts + frontend: Critical 0 / High 0 (the
+three contracts are faithful Uniswap V2 copies; Router pair init-code hash
+matches the Factory on-chain). Frontend-side findings fixed here:
+- M-2: swaps now bind to the quote the user SAW (Guppy Bridge v0.8.2
+  pattern). doSwap re-quotes at send time; if the achievable output dropped
+  below the displayed quote minus slippage, it aborts BEFORE signing and
+  refreshes the quote with a "price moved" message (EN/JA). Equal-or-better
+  proceeds with minOut derived from the displayed quote. 20-minute deadline
+  and exact-amount approvals unchanged.
+- L-1: read failures are no longer silent or mislabelled. quoteSwap checks
+  pair existence first, so "no pool" is distinct from a quote FETCH failure
+  (new message); balance / pool-list / LP read failures raise a visible
+  readWarn banner ("displayed data may be stale") instead of blanking.
+- L-2: slippage — visible warning above 5%, labelled hard cap at 10%
+  (was a silent clamp at 50% inside minOut).
+- L-5: add-liquidity now does the same pre-send balance check as swap,
+  with a per-token insufficient-balance message.
+- L-4: importing a custom token whose self-reported symbol collides with
+  QOMX / WQOMX (and is not the genuine contract) shows a caution that the
+  symbol is unverified. Adding is not blocked.
+Remaining contract-side item is M-1 (feeToSetter stays with Teh Fund) —
+not fixable from the frontend.

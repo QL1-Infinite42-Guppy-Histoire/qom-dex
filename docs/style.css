@@ -65,6 +65,7 @@ input.mini{width:84px;background:var(--panel);border:1px solid var(--line-d);box
 :root[data-theme="dark"] .notice.warn{color:#fca5a5;border-color:var(--red-d)}
 .quote,.status{font-size:14px;color:var(--muted);min-height:20px;white-space:pre-wrap;word-break:break-all}
 .status{color:var(--accent)}
+.status.warn{color:var(--red-d);font-weight:700}
 .note{font-size:13px;color:var(--muted);line-height:1.55}
 .muted{color:var(--muted)}
 .addr{font-family:monospace;font-size:13px;word-break:break-all}

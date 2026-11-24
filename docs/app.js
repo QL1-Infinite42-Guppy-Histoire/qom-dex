@@ -9,13 +9,19 @@ const PAIR_ABI = ["function getReserves() view returns (uint112,uint112,uint32)"
 const WQOMX_ABI = ["function deposit() payable","function withdraw(uint256)","function balanceOf(address) view returns (uint256)"];
 
 const I18N = {
-  en:{tabSwap:"Swap",tabPool:"Pool",tabWrap:"Wrap",tabDeploy:"Deploy",youPay:"You pay",youReceive:"You receive (estimated)",slippage:"Slippage %",connect:"Connect Wallet",connected:"Connected",wrongNet:"Wrong network — click Connect to switch to Qom (33303).",notDeployed:"The DEX contracts are not configured in this build.",pickToken:"Pick a token",importBtn:"Import",addLiq:"Add liquidity",removeLiq:"Remove liquidity",pairLabel:"Pair (Token A / Token B above)",wrapNote:"QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.",wrapBtn:"Wrap",unwrapBtn:"Unwrap",deployTitle:"Deploy the DEX (one time)",deployNote:"Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.",handoffTitle:"Addresses for Teh Fund / pool creators",copyBtn:"Copy",noPool:"No pool / no liquidity for this pair yet — quote unavailable. Create it in the Pool tab.",quoteOk:(r)=>`Rate ≈ ${r}`,needConnect:"Connect your wallet first.",needDeployed:"Contracts not configured in this build.",working:"Working… check your wallet.",done:(h)=>`Done ✓ tx: ${h}`,failed:(m)=>`Failed: ${m}`,bal:(b,s)=>`Balance: ${b} ${s}`,lpBal:(b)=>`Your LP balance: ${b}`,insufficient:"Amount exceeds your balance / allowance flow failed.",useWrap:"QOMX ⇄ WQOMX is 1:1 — use the Wrap tab, not Swap.",samePair:"Pick two different tokens for a pair.",tag_official:"official ERC-20",poolsTitle:"Pools on this DEX",devNotice:"🚧 The official QOM DEX — contracts deployed by Teh Fund, frontend built by the community. No pools are live yet and the first real swap has not been done. Use at your own risk.",adminTitle:"Factory admin",adminCur:"Current feeToSetter",adminFeeTo:"Protocol fee recipient (feeTo)",feeToUnset:"unset",adminNew:"New feeToSetter address",adminNote:"This only hands over the right to set the protocol fee recipient in future. No funds move. One signature from the current feeToSetter wallet.",adminBtn:"Transfer feeToSetter role",adminDone:"Done. The new feeToSetter is now:",adminBadAddr:"That address is not valid.",poolsNone:"No pools yet — create the first one above.",openInMM:"Open this page in MetaMask",noWallet:"No wallet found in this browser. Open this page inside MetaMask (or install MetaMask), then tap Connect Wallet.",tag_wrapped:"wrapped",tag_native:"via WQOMX",qomxNote:"QOMX in the list is the official ERC-20 contract (0xD494…0517): its balance IS your native QOMX balance — the same coins, spendable directly. WQOMX is a separate wrapped token — wrap and unwrap 1:1 any time in the Wrap tab."},
-  ja:{tabSwap:"スワップ",tabPool:"プール",tabWrap:"ラップ",tabDeploy:"デプロイ",youPay:"支払う",youReceive:"受け取る（見込み）",slippage:"スリッページ %",connect:"ウォレット接続",connected:"接続済み",wrongNet:"ネットワークが違います —「ウォレット接続」から Qom (33303) に切り替えてください。",notDeployed:"DEXコントラクトがこのビルドに設定されていません。",pickToken:"トークンを選ぶ",importBtn:"追加",addLiq:"流動性を追加",removeLiq:"流動性を削除",pairLabel:"ペア（上の Token A / Token B）",wrapNote:"QOMX ⇄ WQOMX は常に 1:1。WQOMX は DEX で使う QOMX の ERC-20 版です。",wrapBtn:"ラップ",unwrapBtn:"アンラップ",deployTitle:"DEXをデプロイ（初回のみ）",deployNote:"あなたのウォレットから WQOMX → Factory → Router02 の順にデプロイします。各ステップであなたが署名し、鍵は誰にも渡りません。feeTo は未設定（プロトコル手数料OFF）、feeToSetter はあなたのアドレスです。ガス見積もり合計 ≈ 850万 gas — 現在のガス価格では約460 QOMX になるため、デプロイ用ウォレットには 600 QOMX 以上を用意してください。",handoffTitle:"Teh Fund / プール作成者向けアドレス一覧",copyBtn:"コピー",noPool:"このペアのプール／流動性がまだ無いため見積もりできません。「プール」タブで作成できます。",quoteOk:(r)=>`レート ≈ ${r}`,needConnect:"先にウォレットを接続してください。",needDeployed:"コントラクトがこのビルドに設定されていません。",working:"処理中… ウォレットを確認してください。",done:(h)=>`完了 ✓ tx: ${h}`,failed:(m)=>`失敗: ${m}`,bal:(b,s)=>`残高: ${b} ${s}`,lpBal:(b)=>`あなたのLP残高: ${b}`,insufficient:"残高不足、または承認フローに失敗しました。",useWrap:"QOMX ⇄ WQOMX は 1:1 です — スワップではなく「ラップ」タブを使ってください。",samePair:"ペアには異なる2つのトークンを選んでください。",tag_official:"公式 ERC-20",poolsTitle:"このDEXのプール",devNotice:"🚧 公式QOM DEX — コントラクトは Teh Fund がデプロイ、フロントエンドはコミュニティが開発しました。プールはまだ開始しておらず、初回の実スワップも未実施です。利用は自己責任でお願いします。",adminTitle:"Factory 管理",adminCur:"現在の feeToSetter",adminFeeTo:"プロトコル手数料の受取先（feeTo）",feeToUnset:"未設定",adminNew:"新しい feeToSetter のアドレス",adminNote:"これは将来プロトコル手数料の受取先を設定できる権限を移すだけです。資金は一切動きません。現在の feeToSetter のウォレットで署名1回です。",adminBtn:"feeToSetter 権限を移転する",adminDone:"完了しました。新しい feeToSetter：",adminBadAddr:"アドレスの形式が正しくありません。",poolsNone:"プールはまだありません — 上で最初のプールを作れます。",openInMM:"MetaMaskでこのページを開く",noWallet:"このブラウザにウォレットが見つかりません。MetaMaskの中でこのページを開く（またはMetaMaskを入れる）→「ウォレット接続」を押してください。",tag_wrapped:"ラップ済み",tag_native:"WQOMX 経由",qomxNote:"リストの QOMX は公式 ERC-20 コントラクト（0xD494…0517）です。残高はネイティブ QOMX の残高そのもの（同じコイン）で、そのまま使えます。WQOMX は別のラップ済みトークンです（「ラップ」タブでいつでも 1:1 で変換できます）。"}
+  en:{tabSwap:"Swap",tabPool:"Pool",tabWrap:"Wrap",tabDeploy:"Deploy",youPay:"You pay",youReceive:"You receive (estimated)",slippage:"Slippage %",connect:"Connect Wallet",connected:"Connected",wrongNet:"Wrong network — click Connect to switch to Qom (33303).",notDeployed:"The DEX contracts are not configured in this build.",pickToken:"Pick a token",importBtn:"Import",addLiq:"Add liquidity",removeLiq:"Remove liquidity",pairLabel:"Pair (Token A / Token B above)",wrapNote:"QOMX ⇄ WQOMX is always 1:1. WQOMX is the ERC-20 form of QOMX used by the DEX.",wrapBtn:"Wrap",unwrapBtn:"Unwrap",deployTitle:"Deploy the DEX (one time)",deployNote:"Deploys WQOMX → Factory → Router02 from YOUR wallet. You sign each step; nobody else holds the keys. feeTo stays unset (protocol fee OFF), feeToSetter = your address. Estimated total gas ≈ 8.5M gas — at the chain's current gas price that is roughly 460 QOMX, so prepare at least 600 QOMX in the deploying wallet.",handoffTitle:"Addresses for Teh Fund / pool creators",copyBtn:"Copy",noPool:"No pool / no liquidity for this pair yet — quote unavailable. Create it in the Pool tab.",quoteOk:(r)=>`Rate ≈ ${r}`,needConnect:"Connect your wallet first.",needDeployed:"Contracts not configured in this build.",working:"Working… check your wallet.",done:(h)=>`Done ✓ tx: ${h}`,failed:(m)=>`Failed: ${m}`,bal:(b,s)=>`Balance: ${b} ${s}`,lpBal:(b)=>`Your LP balance: ${b}`,insufficient:"Amount exceeds your balance / allowance flow failed.",useWrap:"QOMX ⇄ WQOMX is 1:1 — use the Wrap tab, not Swap.",samePair:"Pick two different tokens for a pair.",tag_official:"official ERC-20",poolsTitle:"Pools on this DEX",devNotice:"🚧 The official QOM DEX — contracts deployed by Teh Fund, frontend built by the community. No pools are live yet and the first real swap has not been done. Use at your own risk.",adminTitle:"Factory admin",adminCur:"Current feeToSetter",adminFeeTo:"Protocol fee recipient (feeTo)",feeToUnset:"unset",adminNew:"New feeToSetter address",adminNote:"This only hands over the right to set the protocol fee recipient in future. No funds move. One signature from the current feeToSetter wallet.",adminBtn:"Transfer feeToSetter role",adminDone:"Done. The new feeToSetter is now:",adminBadAddr:"That address is not valid.",poolsNone:"No pools yet — create the first one above.",openInMM:"Open this page in MetaMask",noWallet:"No wallet found in this browser. Open this page inside MetaMask (or install MetaMask), then tap Connect Wallet.",tag_wrapped:"wrapped",tag_native:"via WQOMX",qomxNote:"QOMX in the list is the official ERC-20 contract (0xD494…0517): its balance IS your native QOMX balance — the same coins, spendable directly. WQOMX is a separate wrapped token — wrap and unwrap 1:1 any time in the Wrap tab.",quoteFail:"Could not fetch a quote — the chain / RPC may be unreachable. This is NOT the same as 'no pool': please wait a moment and retry.",readWarn:"⚠️ Some data could not be loaded (RPC read failure). Balances and pool information shown may be out of date — reload the page to retry.",priceMoved:(a,b)=>`Price moved since the quote you saw: expected ≈ ${a}, now ≈ ${b}. The swap was cancelled BEFORE signing and the quote has been refreshed — review it and try again.`,slipHigh:"⚠️ High slippage: with this setting you may receive much less than the quoted amount.",slipCap:(cap)=>`Slippage is capped at ${cap}% for safety — your input was adjusted to ${cap}%.`,insufficientBal:(s)=>`Insufficient ${s} balance for this amount.`,symbolCaution:(s)=>`⚠️ Caution: the symbol "${s}" is reported by this token's own contract — any contract can call itself QOMX or WQOMX. The symbol is NOT verified; double-check the contract address.`},
+  ja:{tabSwap:"スワップ",tabPool:"プール",tabWrap:"ラップ",tabDeploy:"デプロイ",youPay:"支払う",youReceive:"受け取る（見込み）",slippage:"スリッページ %",connect:"ウォレット接続",connected:"接続済み",wrongNet:"ネットワークが違います —「ウォレット接続」から Qom (33303) に切り替えてください。",notDeployed:"DEXコントラクトがこのビルドに設定されていません。",pickToken:"トークンを選ぶ",importBtn:"追加",addLiq:"流動性を追加",removeLiq:"流動性を削除",pairLabel:"ペア（上の Token A / Token B）",wrapNote:"QOMX ⇄ WQOMX は常に 1:1。WQOMX は DEX で使う QOMX の ERC-20 版です。",wrapBtn:"ラップ",unwrapBtn:"アンラップ",deployTitle:"DEXをデプロイ（初回のみ）",deployNote:"あなたのウォレットから WQOMX → Factory → Router02 の順にデプロイします。各ステップであなたが署名し、鍵は誰にも渡りません。feeTo は未設定（プロトコル手数料OFF）、feeToSetter はあなたのアドレスです。ガス見積もり合計 ≈ 850万 gas — 現在のガス価格では約460 QOMX になるため、デプロイ用ウォレットには 600 QOMX 以上を用意してください。",handoffTitle:"Teh Fund / プール作成者向けアドレス一覧",copyBtn:"コピー",noPool:"このペアのプール／流動性がまだ無いため見積もりできません。「プール」タブで作成できます。",quoteOk:(r)=>`レート ≈ ${r}`,needConnect:"先にウォレットを接続してください。",needDeployed:"コントラクトがこのビルドに設定されていません。",working:"処理中… ウォレットを確認してください。",done:(h)=>`完了 ✓ tx: ${h}`,failed:(m)=>`失敗: ${m}`,bal:(b,s)=>`残高: ${b} ${s}`,lpBal:(b)=>`あなたのLP残高: ${b}`,insufficient:"残高不足、または承認フローに失敗しました。",useWrap:"QOMX ⇄ WQOMX は 1:1 です — スワップではなく「ラップ」タブを使ってください。",samePair:"ペアには異なる2つのトークンを選んでください。",tag_official:"公式 ERC-20",poolsTitle:"このDEXのプール",devNotice:"🚧 公式QOM DEX — コントラクトは Teh Fund がデプロイ、フロントエンドはコミュニティが開発しました。プールはまだ開始しておらず、初回の実スワップも未実施です。利用は自己責任でお願いします。",adminTitle:"Factory 管理",adminCur:"現在の feeToSetter",adminFeeTo:"プロトコル手数料の受取先（feeTo）",feeToUnset:"未設定",adminNew:"新しい feeToSetter のアドレス",adminNote:"これは将来プロトコル手数料の受取先を設定できる権限を移すだけです。資金は一切動きません。現在の feeToSetter のウォレットで署名1回です。",adminBtn:"feeToSetter 権限を移転する",adminDone:"完了しました。新しい feeToSetter：",adminBadAddr:"アドレスの形式が正しくありません。",poolsNone:"プールはまだありません — 上で最初のプールを作れます。",openInMM:"MetaMaskでこのページを開く",noWallet:"このブラウザにウォレットが見つかりません。MetaMaskの中でこのページを開く（またはMetaMaskを入れる）→「ウォレット接続」を押してください。",tag_wrapped:"ラップ済み",tag_native:"WQOMX 経由",qomxNote:"リストの QOMX は公式 ERC-20 コントラクト（0xD494…0517）です。残高はネイティブ QOMX の残高そのもの（同じコイン）で、そのまま使えます。WQOMX は別のラップ済みトークンです（「ラップ」タブでいつでも 1:1 で変換できます）。",quoteFail:"見積もりを取得できませんでした（チェーン／RPCに接続できない可能性があります）。これは「プールが無い」とは別の状態です。少し待って再試行してください。",readWarn:"⚠️ 一部のデータを読み取れませんでした（RPC読み取り失敗）。表示中の残高・プール情報が古い可能性があります。ページを再読み込みして再試行してください。",priceMoved:(a,b)=>`表示されていた見積もりから価格が動きました（見込み ≈ ${a} → 現在 ≈ ${b}）。署名の前にスワップを中止し、見積もりを更新しました。内容を確認して再試行してください。`,slipHigh:"⚠️ スリッページが高すぎます。この設定では見積もりより大幅に少なく受け取る可能性があります。",slipCap:(cap)=>`安全のためスリッページの上限は ${cap}% です。入力を ${cap}% に調整しました。`,insufficientBal:(s)=>`${s} の残高が不足しています。`,symbolCaution:(s)=>`⚠️ 注意：シンボル「${s}」はこのトークンのコントラクト自身が名乗っているものです。QOMX や WQOMX のような名前はどのコントラクトでも名乗れます。シンボルは検証されていません — コントラクトアドレスをよく確認してください。`}
 };
 let lang = localStorage.getItem("qomdex-lang") || "en";
 const t = k => I18N[lang][k];
 
 let readProvider, provider, signer, account = null;
+// L-1: track which read paths are currently failing so a visible banner can
+// say "displayed data may be stale" instead of silently blanking values.
+const readFailSrc = new Set();
+function noteReadFail(src){ readFailSrc.add(src); renderReadWarn(); }
+function noteReadOk(src){ readFailSrc.delete(src); renderReadWarn(); }
+function renderReadWarn(){ const el = $("readWarn"); if(!el) return; el.hidden = readFailSrc.size === 0; if(!el.hidden) el.textContent = t("readWarn"); }
 function safeParse(s, fb){ try{ const v = JSON.parse(s); return v ?? fb; }catch(e){ return fb; } }
 let addrs = loadAddrs();
 function loadAddrs(){
@@ -37,7 +43,14 @@ let liqA = tokenList()[0], liqB = tokenList()[1] || tokenList()[0];
 
 function fmt(n, d=6){ if(n===null||n===undefined||isNaN(n)) return "0"; return Number(n).toLocaleString("en-US",{maximumFractionDigits:d}); }
 function deadline(){ return BigInt(Math.floor(Date.now()/1000)+1200); }
-function minOut(amount, slipPct){ let s = Number(slipPct); if(!(s>=0)) s = 0; if(s>50) s = 50; const bps = BigInt(Math.round((100 - s)*100)); return amount * bps / 10000n; }
+const SLIP_MAX = 10, SLIP_WARN = 5; // percent: hard cap, and the threshold above which a high-slippage warning is shown
+function slipInfo(raw){ let s = Number(raw); if(!(s>=0)) s = 0; const capped = s > SLIP_MAX; if(capped) s = SLIP_MAX; return { value:s, capped, warn: s > SLIP_WARN }; }
+function minOut(amount, slipPct){ const s = slipInfo(slipPct).value; const bps = BigInt(Math.round((100 - s)*100)); return amount * bps / 10000n; }
+// M-2 drift guard: true when the output achievable NOW has dropped below what
+// the quote the user actually SAW guarantees (displayed quote minus slippage).
+// In that case the send must abort before signing instead of silently
+// re-anchoring the minimum to the worse, fresh quote.
+function driftAbort(shownOut, freshOut, slipPct){ if(shownOut === null || shownOut === undefined) return false; return freshOut < minOut(shownOut, slipPct); }
 
 async function init(){
   readProvider = new ethers.JsonRpcProvider(CFG.rpcUrl, CFG.chainId);
@@ -60,7 +73,7 @@ function applyLang(){
   document.querySelectorAll("[data-i18n]").forEach(el=>{ const k=el.dataset.i18n; if(I18N[lang][k]) el.textContent = I18N[lang][k]; });
   $("langBtn").textContent = lang==="en" ? "日本語" : "English";
   if(!account) $("connectBtn").textContent = t("connect");
-  refreshDeployedUI();
+  refreshDeployedUI(); renderReadWarn(); checkSlippage();
 }
 $("langBtn").onclick = ()=>{ lang = lang==="en"?"ja":"en"; localStorage.setItem("qomdex-lang", lang); applyLang(); };
 $("themeBtn").onclick = ()=>{ const d = document.documentElement.dataset.theme==="dark"; document.documentElement.dataset.theme = d?"":"dark"; localStorage.setItem("guppy-theme", d?"light":"dark"); $("themeBtn").textContent = d?"🌙 Dark":"☀️ Light"; };
@@ -103,7 +116,14 @@ $("addTokBtn").onclick = async ()=>{
   const raw = $("customTokAddr").value.trim();
   if(!ethers.isAddress(raw)){ $("tokStatus").textContent = t("failed")("not a valid address"); return; }
   const a = ethers.getAddress(raw);
-  try{ const c = new ethers.Contract(a, ERC20_ABI, readProvider); const [s,d] = await Promise.all([c.symbol(), c.decimals()]); const dec = Number(d); if(!(dec>=0 && dec<=36) || !s) throw new Error("bad token metadata"); const tok={symbol:String(s).slice(0,32), address:a, decimals:dec}; customTokens = customTokens.filter(x=>x.address.toLowerCase()!==a.toLowerCase()); customTokens.push(tok); localStorage.setItem("qomdex-tokens", JSON.stringify(customTokens)); $("tokStatus").textContent = "✓ "+tok.symbol; if(pickerTarget) pickerTarget(tok); renderTokButtons(); }
+  try{ const c = new ethers.Contract(a, ERC20_ABI, readProvider); const [s,d] = await Promise.all([c.symbol(), c.decimals()]); const dec = Number(d); if(!(dec>=0 && dec<=36) || !s) throw new Error("bad token metadata"); const tok={symbol:String(s).slice(0,32), address:a, decimals:dec}; customTokens = customTokens.filter(x=>x.address.toLowerCase()!==a.toLowerCase()); customTokens.push(tok); localStorage.setItem("qomdex-tokens", JSON.stringify(customTokens));
+  // L-4: if the imported token's self-reported symbol collides with a
+  // built-in symbol (QOMX / WQOMX) but this is NOT the genuine built-in
+  // contract, warn that the symbol is unverified. Adding is not blocked.
+  const builtinSyms = ["QOMX","WQOMX"];
+  const isGenuine = a.toLowerCase() === String(CFG.qomxErc20||"").toLowerCase() || a.toLowerCase() === String(addrs.wqomx||"").toLowerCase();
+  $("tokStatus").textContent = "✓ "+tok.symbol + (!isGenuine && builtinSyms.includes(tok.symbol.toUpperCase()) ? " — " + t("symbolCaution")(tok.symbol) : "");
+  if(pickerTarget) pickerTarget(tok); renderTokButtons(); }
   catch(e){ $("tokStatus").textContent = t("failed")("not an ERC-20 readable at this address"); }
 };
 
@@ -115,26 +135,56 @@ async function balOf(tok, who){
 }
 async function refreshBalances(){
   if(!account) return;
-  for(const [tok,el] of [[swapIn,"swapInBal"],[swapOut,"swapOutBal"]]){ try{ const b=await balOf(tok,account); $(el).textContent = t("bal")(fmt(ethers.formatUnits(b, tok.decimals)), tok.symbol); }catch(e){ $(el).textContent=""; } }
+  let allOk = true;
+  for(const [tok,el] of [[swapIn,"swapInBal"],[swapOut,"swapOutBal"]]){ try{ const b=await balOf(tok,account); $(el).textContent = t("bal")(fmt(ethers.formatUnits(b, tok.decimals)), tok.symbol); }catch(e){ allOk = false; /* keep the last shown value; the readWarn banner says it may be stale */ } }
+  if(allOk) noteReadOk("bal"); else noteReadFail("bal");
 }
 let quoteSeq = 0;
+let shownQuote = null; // the quote currently on screen: {key, outRaw} — doSwap binds the send to THIS (M-2)
 async function quoteSwap(){
   const seq = ++quoteSeq;
-  const amt = $("swapInAmt").value; $("swapQuote").textContent=""; $("swapOutAmt").value="";
+  const amt = $("swapInAmt").value; $("swapQuote").textContent=""; $("swapOutAmt").value=""; shownQuote = null;
   if(!deployed() || !amt || Number(amt)<=0 || swapIn.address===swapOut.address) return;
   const aIn = effAddr(swapIn).toLowerCase(), aOut = effAddr(swapOut).toLowerCase();
   const wrapPair = (aIn===CFG.qomxErc20.toLowerCase() && aOut===addrs.wqomx.toLowerCase()) || (aOut===CFG.qomxErc20.toLowerCase() && aIn===addrs.wqomx.toLowerCase());
   if(effAddr(swapIn)===effAddr(swapOut) || wrapPair){ $("swapQuote").textContent = t("useWrap"); $("swapBtn").disabled = true; return; }
+  const amtInRaw = ethers.parseUnits(amt, swapIn.decimals);
   try{
+    // L-1: check pair existence first so "no pool" is not confused with an
+    // RPC/read failure (previously every error was reported as "no pool").
+    const factory = new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider);
+    const pair = await factory.getPair(effAddr(swapIn), effAddr(swapOut));
+    if(seq !== quoteSeq) return; // a newer quote superseded this one
+    if(pair === ethers.ZeroAddress){ $("swapQuote").textContent = t("noPool"); $("swapBtn").disabled = true; return; }
     const router = new ethers.Contract(addrs.router, ROUTER_ABI, readProvider);
-    const amounts = await router.getAmountsOut(ethers.parseUnits(amt, swapIn.decimals), [effAddr(swapIn), effAddr(swapOut)]);
+    const amounts = await router.getAmountsOut(amtInRaw, [effAddr(swapIn), effAddr(swapOut)]);
     if(seq !== quoteSeq) return; // a newer quote superseded this one
     $("swapOutAmt").value = fmt(ethers.formatUnits(amounts[1], swapOut.decimals));
     $("swapQuote").textContent = t("quoteOk")(`1 ${swapIn.symbol} = ${fmt(Number(ethers.formatUnits(amounts[1],swapOut.decimals))/Number(amt))} ${swapOut.symbol}`);
+    shownQuote = { key: aIn+"|"+aOut+"|"+amtInRaw.toString(), outRaw: amounts[1] };
     $("swapBtn").disabled = !account;
-  }catch(e){ if(seq === quoteSeq){ $("swapQuote").textContent = t("noPool"); $("swapBtn").disabled = true; } }
+  }catch(e){
+    if(seq !== quoteSeq) return;
+    // A pair that exists but holds no liquidity reverts INSUFFICIENT_LIQUIDITY
+    // inside getAmountsOut — that is still honestly "no pool / no liquidity".
+    // Anything else (network, RPC, decode) is a quote FETCH failure.
+    const msg = String((e && (e.shortMessage || e.message)) || "");
+    $("swapQuote").textContent = /INSUFFICIENT_LIQUIDITY|INSUFFICIENT_OUTPUT_AMOUNT/.test(msg) ? t("noPool") : t("quoteFail");
+    $("swapBtn").disabled = true;
+  }
 }
 $("swapInAmt").addEventListener("input", quoteSwap);
+// L-2: visible warning for high slippage, and a labelled hard cap instead of
+// the old silent 50% clamp inside minOut.
+function checkSlippage(){
+  const el = $("slipWarn"); if(!el) return;
+  const info = slipInfo($("slippage").value);
+  if(info.capped){ $("slippage").value = SLIP_MAX; el.textContent = t("slipCap")(SLIP_MAX); }
+  else if(info.warn){ el.textContent = t("slipHigh"); }
+  else el.textContent = "";
+}
+$("slippage").addEventListener("input", checkSlippage);
+$("slippage").addEventListener("change", checkSlippage);
 
 async function ensureApprove(tokAddr, spender, amount, statusEl){
   const c = new ethers.Contract(tokAddr, ERC20_ABI, signer);
@@ -150,8 +200,22 @@ async function doSwap(){
     if(amtIn <= 0n){ st.textContent = t("insufficient"); return; }
     const balIn = await balOf(swapIn, account); if(balIn !== null && balIn < amtIn){ st.textContent = t("insufficient"); return; }
     const router = new ethers.Contract(addrs.router, ROUTER_ABI, signer);
-    const amounts = await router.getAmountsOut(amtIn, [effAddr(swapIn), effAddr(swapOut)]);
-    const outMin = minOut(amounts[1], $("slippage").value || 0.5);
+    const slip = $("slippage").value || 0.5;
+    // M-2: bind the send to the quote the user actually SAW (Guppy Bridge
+    // v0.8.2 pattern). Re-quote now; if the achievable output has dropped
+    // below the displayed quote minus slippage, abort BEFORE signing and
+    // refresh the displayed quote. If it is equal or better, proceed with
+    // outMin derived from the DISPLAYED quote, not the fresh one.
+    const readRouter = new ethers.Contract(addrs.router, ROUTER_ABI, readProvider);
+    const amounts = await readRouter.getAmountsOut(amtIn, [effAddr(swapIn), effAddr(swapOut)]);
+    const key = effAddr(swapIn).toLowerCase()+"|"+effAddr(swapOut).toLowerCase()+"|"+amtIn.toString();
+    const shown = (shownQuote && shownQuote.key === key) ? shownQuote.outRaw : null;
+    if(driftAbort(shown, amounts[1], slip)){
+      st.textContent = t("priceMoved")(fmt(ethers.formatUnits(shown, swapOut.decimals))+" "+swapOut.symbol, fmt(ethers.formatUnits(amounts[1], swapOut.decimals))+" "+swapOut.symbol);
+      shownQuote = null; quoteSwap();
+      return;
+    }
+    const outMin = minOut(shown !== null ? shown : amounts[1], slip);
     let tx;
     if(swapIn.address==="native") tx = await router.swapExactETHForTokens(outMin, [addrs.wqomx, effAddr(swapOut)], account, deadline(), {value: amtIn});
     else if(swapOut.address==="native"){ await ensureApprove(swapIn.address, addrs.router, amtIn, st); tx = await router.swapExactTokensForETH(amtIn, outMin, [swapIn.address, addrs.wqomx], account, deadline()); }
@@ -165,7 +229,7 @@ async function loadPools(){
   try{
     const f = new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider);
     const n = Number(await f.allPairsLength());
-    if(n===0){ el.innerHTML = ""; const p=document.createElement("p"); p.className="muted"; p.textContent = t("poolsNone"); el.appendChild(p); return; }
+    if(n===0){ el.innerHTML = ""; const p=document.createElement("p"); p.className="muted"; p.textContent = t("poolsNone"); el.appendChild(p); noteReadOk("pools"); return; }
     el.innerHTML = "";
     for(let i=0;i<n;i++){
       const pair = await f.allPairs(i);
@@ -179,14 +243,15 @@ async function loadPools(){
       const span = document.createElement("span"); span.textContent = fmt(ethers.formatUnits(r[0], d0)) + " " + s0 + " · " + fmt(ethers.formatUnits(r[1], d1)) + " " + s1;
       row.appendChild(a); row.appendChild(span); el.appendChild(row);
     }
-  }catch(e){ /* leave as-is */ }
+    noteReadOk("pools");
+  }catch(e){ noteReadFail("pools"); /* keep whatever is already rendered; the readWarn banner flags it as possibly stale */ }
 }
 $("swapBtn").onclick = doSwap;
 
 async function refreshLp(){
   if(!deployed() || !account || effAddr(liqA)===effAddr(liqB)) { $("lpBal").textContent=""; $("liqRemoveBtn").disabled = true; return; }
-  try{ const f=new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider); const pair=await f.getPair(effAddr(liqA), effAddr(liqB)); if(pair===ethers.ZeroAddress){ $("lpBal").textContent=t("noPool"); $("liqRemoveBtn").disabled = true; return; } const p=new ethers.Contract(pair, PAIR_ABI, readProvider); const b=await p.balanceOf(account); $("lpBal").textContent = t("lpBal")(fmt(ethers.formatEther(b)))+" · Pair: "+pair; $("liqRemoveBtn").disabled = b===0n; }
-  catch(e){ $("lpBal").textContent=""; }
+  try{ const f=new ethers.Contract(addrs.factory, FACTORY_ABI, readProvider); const pair=await f.getPair(effAddr(liqA), effAddr(liqB)); if(pair===ethers.ZeroAddress){ $("lpBal").textContent=t("noPool"); $("liqRemoveBtn").disabled = true; noteReadOk("lp"); return; } const p=new ethers.Contract(pair, PAIR_ABI, readProvider); const b=await p.balanceOf(account); $("lpBal").textContent = t("lpBal")(fmt(ethers.formatEther(b)))+" · Pair: "+pair; $("liqRemoveBtn").disabled = b===0n; noteReadOk("lp"); }
+  catch(e){ $("lpBal").textContent=""; noteReadFail("lp"); }
 }
 async function doAddLiq(){
   const st=$("liqStatus"); if(!account){ st.textContent=t("needConnect"); return; }
@@ -195,6 +260,10 @@ async function doAddLiq(){
     if(effAddr(liqA)===effAddr(liqB)){ st.textContent = t("samePair"); return; }
     const aAmt=ethers.parseUnits($("liqAAmt").value, liqA.decimals), bAmt=ethers.parseUnits($("liqBAmt").value, liqB.decimals);
     if(aAmt <= 0n || bAmt <= 0n){ st.textContent = t("insufficient"); return; }
+    // L-5: same pre-send balance check the swap path has (was missing here —
+    // an under-funded add previously just reverted on-chain and cost gas).
+    const balA = await balOf(liqA, account); if(balA !== null && balA < aAmt){ st.textContent = t("insufficientBal")(liqA.symbol); return; }
+    const balB = await balOf(liqB, account); if(balB !== null && balB < bAmt){ st.textContent = t("insufficientBal")(liqB.symbol); return; }
     const router=new ethers.Contract(addrs.router, ROUTER_ABI, signer); const slip=$("slippage").value||0.5;
     let tx;
     if(liqA.address==="native"||liqB.address==="native"){
