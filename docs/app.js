@@ -111,16 +111,20 @@ async function connect(){
   if(Number(net.chainId) !== CFG.chainId){ $("netNotice").hidden=false; $("netNotice").textContent = t("wrongNet"); return; }
   signer = await provider.getSigner(); account = await signer.getAddress();
   $("connectBtn").textContent = t("connected")+": "+account.slice(0,6)+"…"+account.slice(-4);
-  refreshDeployedUI(); refreshBalances(); quoteSwap(); refreshLp(); updateMaxBtn();
+  refreshDeployedUI(); refreshBalances(); quoteSwap(); refreshLp(); updatePctRow();
 }
 $("connectBtn").onclick = ()=> connect().catch(e=>{ $("netNotice").hidden=false; $("netNotice").textContent = t("failed")(e.shortMessage||e.message); });
 
 function renderTokButtons(){
   $("swapInTok").textContent = tokLabel(swapIn)+" ▾"; $("swapOutTok").textContent = tokLabel(swapOut)+" ▾";
   $("liqATok").textContent = tokLabel(liqA)+" ▾"; $("liqBTok").textContent = tokLabel(liqB)+" ▾";
-  updateMaxBtn();
+  updatePctRow();
 }
-function updateMaxBtn(){ const b = $("swapInMax"); if(!b) return; b.hidden = !(account && CFG.qomxErc20 && swapIn.address.toLowerCase() === CFG.qomxErc20.toLowerCase()); }
+const isQomx = tok => !!CFG.qomxErc20 && tok.address.toLowerCase() === CFG.qomxErc20.toLowerCase();
+function updatePctRow(){
+  const on = !!account && deployed();
+  document.querySelectorAll("#swapPctRow .pct-btn, #liqPctRow .pct-btn").forEach(b => b.disabled = !on);
+}
 let pickerTarget = null;
 function openPicker(setter){ pickerTarget = setter; const list=$("tokList"); list.innerHTML=""; tokenList().forEach(tok=>{ const b=document.createElement("button"); b.className="tok-btn"; b.textContent=`${tokLabel(tok)}${tok.tag && !tok.label?" ("+t("tag_"+tok.tag)+")":""} — ${tok.address==="native"?"native":tok.address.slice(0,10)+"…"}`; b.onclick=()=>{ setter(tok); $("tokDlg").close(); renderTokButtons(); quoteSwap(); refreshBalances(); refreshLp(); updateLiqInfo(); }; list.appendChild(b); }); $("tokDlg").showModal(); }
 $("swapInTok").onclick=()=>openPicker(v=>swapIn=v); $("swapOutTok").onclick=()=>openPicker(v=>swapOut=v);
@@ -214,34 +218,72 @@ async function quoteSwap(){
 }
 $("swapInAmt").addEventListener("input", quoteSwap);
 // The QOMX in the list IS the native balance (0xD494 precompile), so gas is
-// paid from the same coins being swapped. MAX therefore leaves a gas
-// reserve: live swap-gas estimate x1.2 x gas price.
+// paid from the same coins being swapped. Percentage buttons therefore act
+// on (balance - gas reserve) for QOMX, and MAX means "everything except the
+// reserve". The reserve is a live swap-gas estimate x1.2 x gas price.
 async function gasReserveWei(estGas){
   const fd = await readProvider.getFeeData();
   const gp = fd.gasPrice || 0n;
   return (estGas * 120n / 100n) * gp;
 }
-$("swapInMax").onclick = async ()=>{
+async function swapGasEstimate(){
+  try{
+    const r = new ethers.Contract(addrs.router, ROUTER_ABI, signer);
+    const bal = await readProvider.getBalance(account);
+    const probe = bal / 2n > 0n ? bal / 2n : bal;
+    let est = await r.swapExactTokensForTokens.estimateGas(probe, 0n, [effAddr(swapIn), effAddr(swapOut)], account, deadline());
+    const c = new ethers.Contract(swapIn.address, ERC20_ABI, readProvider);
+    if(await c.allowance(account, addrs.router) < probe) est += 60000n; // first swap also pays the approve
+    return est;
+  }catch(e){ return 220000n; } // fallback if the swap cannot be estimated yet
+}
+async function spendable(tok, estGas){
+  let base = await balOf(tok, account);
+  if(base === null) return null;
+  if(isQomx(tok)){
+    const reserve = await gasReserveWei(estGas);
+    base = base > reserve ? base - reserve : 0n;
+  }
+  return base;
+}
+async function setSwapPct(pct){
   if(!account) return;
   const st = $("swapStatus");
   try{
-    const bal = await readProvider.getBalance(account);
-    let est = 220000n; // fallback if the swap cannot be estimated yet (e.g. no amount typed)
-    try{
-      const r = new ethers.Contract(addrs.router, ROUTER_ABI, signer);
-      const probe = bal / 2n > 0n ? bal / 2n : bal;
-      est = await r.swapExactTokensForTokens.estimateGas(probe, 0n, [effAddr(swapIn), effAddr(swapOut)], account, deadline());
-      const c = new ethers.Contract(swapIn.address, ERC20_ABI, readProvider);
-      if(await c.allowance(account, addrs.router) < probe) est += 60000n; // first swap also pays the approve
-    }catch(e){ /* keep fallback */ }
-    const reserve = await gasReserveWei(est);
-    const maxAmt = bal > reserve ? bal - reserve : 0n;
-    if(maxAmt <= 0n){ st.textContent = t("insufficient"); return; }
-    $("swapInAmt").value = ethers.formatUnits(maxAmt, swapIn.decimals);
+    const base = await spendable(swapIn, await swapGasEstimate());
+    if(base === null) return;
+    const amt = pct >= 100 ? base : base * BigInt(pct) / 100n;
+    if(amt <= 0n){ st.textContent = t("insufficient"); return; }
+    $("swapInAmt").value = ethers.formatUnits(amt, swapIn.decimals);
     st.textContent = "";
     quoteSwap();
   }catch(e){ st.textContent = t("failed")(e.shortMessage || e.message); }
+}
+document.querySelectorAll("#swapPctRow .pct-btn").forEach(b => b.onclick = () => setSwapPct(Number(b.dataset.pct)));
+async function setLiqPct(pct){
+  if(!account) return;
+  const st = $("liqStatus");
+  try{
+    const base = await spendable(liqA, 260000n); // add-liquidity-sized gas estimate
+    if(base === null) return;
+    const amt = pct >= 100 ? base : base * BigInt(pct) / 100n;
+    if(amt <= 0n){ st.textContent = t("insufficient"); return; }
+    $("liqAAmt").value = ethers.formatUnits(amt, liqA.decimals);
+    st.textContent = "";
+    refreshLp(); scheduleLiq("A"); // ratio auto-fill sets the other side
+  }catch(e){ st.textContent = t("failed")(e.shortMessage || e.message); }
+}
+document.querySelectorAll("#liqPctRow .pct-btn").forEach(b => b.onclick = () => setLiqPct(Number(b.dataset.lpct)));
+// Flip button: swap the pair direction. The new input amount is the quote
+// the user just saw (raw value, no locale commas), then a fresh quote runs.
+$("swapFlip").onclick = ()=>{
+  const prevOut = shownQuote ? shownQuote.outRaw : null;
+  const prevOutTok = swapOut;
+  [swapIn, swapOut] = [swapOut, swapIn];
+  $("swapInAmt").value = prevOut !== null ? ethers.formatUnits(prevOut, prevOutTok.decimals) : "";
+  renderTokButtons(); refreshBalances(); quoteSwap();
 };
+
 // L-2: visible warning for high slippage, and a labelled hard cap instead of
 // the old silent 50% clamp inside minOut.
 function checkSlippage(){

@@ -47,9 +47,14 @@
         <button id="swapInTok" class="tok-btn">QOMX ▾</button>
       </div>
       <div class="bal" id="swapInBal"></div>
-      <div class="bal"><button id="swapInMax" class="chip-btn" hidden data-i18n="maxGas">MAX (keep gas)</button></div>
+      <div class="pct-row" id="swapPctRow">
+        <button class="chip-btn pct-btn" data-pct="25" disabled>25%</button>
+        <button class="chip-btn pct-btn" data-pct="50" disabled>50%</button>
+        <button class="chip-btn pct-btn" data-pct="75" disabled>75%</button>
+        <button class="chip-btn pct-btn" data-pct="100" disabled>MAX</button>
+      </div>
     </div>
-    <div class="arrow">↓</div>
+    <button class="arrow" id="swapFlip" type="button" aria-label="Reverse direction">⇅</button>
     <div class="panel">
       <label data-i18n="youReceive">You receive (estimated)</label>
       <div class="row">
@@ -78,6 +83,12 @@
     <div class="panel">
       <label>Token A</label>
       <div class="row"><input id="liqAAmt" type="number" min="0" step="any" placeholder="0.0"><button id="liqATok" class="tok-btn">QOMX ▾</button></div>
+      <div class="pct-row" id="liqPctRow">
+        <button class="chip-btn pct-btn" data-lpct="25" disabled>25%</button>
+        <button class="chip-btn pct-btn" data-lpct="50" disabled>50%</button>
+        <button class="chip-btn pct-btn" data-lpct="75" disabled>75%</button>
+        <button class="chip-btn pct-btn" data-lpct="100" disabled>MAX</button>
+      </div>
     </div>
     <div class="panel">
       <label>Token B</label>
