@@ -106,3 +106,20 @@ matches the Factory on-chain). Frontend-side findings fixed here:
   symbol is unverified. Adding is not blocked.
 Remaining contract-side item is M-1 (feeToSetter stays with Teh Fund) —
 not fixable from the frontend.
+
+## 2026-11-24 — connect() ordering (user report: "no confirmation prompt")
+
+User reported that tapping Connect shows no wallet confirmation prompt and
+connects instantly, in both MetaMask and FoxWallet. Cause: this origin
+(ql1-infinite42-guppy-histoire.github.io) is already authorised in the
+user's wallets from the community DEX / other Guppy's Guide sites — wallet
+site permissions are per-origin, and for an authorised origin
+eth_requestAccounts returns silently. A dApp cannot force the prompt; it
+appears only for first-time connections (or after revoking the site in the
+wallet's connected-sites settings). Reproduced with the real app.js in a
+stub-provider harness: the old flow also only reached the account step via
+getSigner()/eth_accounts AFTER the chain switch, so a switch/add failure
+could block the account step entirely. Fix (frontend only): connect() now
+calls eth_requestAccounts explicitly FIRST, before the chain switch; the
+no-wallet MetaMask deep link is built from the current location. Verified
+in the harness (accounts first, prompt triggered, full connect) and live.

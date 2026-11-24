@@ -52,6 +52,8 @@ function minOut(amount, slipPct){ const s = slipInfo(slipPct).value; const bps =
 // re-anchoring the minimum to the worse, fresh quote.
 function driftAbort(shownOut, freshOut, slipPct){ if(shownOut === null || shownOut === undefined) return false; return freshOut < minOut(shownOut, slipPct); }
 
+function showMmOpen(){ const l = $("mmOpenLink"); if(l) l.href = "https://metamask.app.link/dapp/" + location.host + location.pathname; $("mmOpen").hidden = false; }
+
 async function init(){
   readProvider = new ethers.JsonRpcProvider(CFG.rpcUrl, CFG.chainId);
   applyLang(); refreshDeployedUI(); renderTokButtons();
@@ -59,7 +61,7 @@ async function init(){
   const wireEth = ()=>{ if(window.ethereum && !provider){ provider = new ethers.BrowserProvider(window.ethereum); window.ethereum.on?.("accountsChanged", ()=>location.reload()); window.ethereum.on?.("chainChanged", ()=>location.reload()); $("mmOpen").hidden = true; } };
   wireEth();
   window.addEventListener("ethereum#initialized", wireEth, {once:true});
-  setTimeout(()=>{ if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); $("mmOpen").hidden = false; } }, 1200);
+  setTimeout(()=>{ if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); showMmOpen(); } }, 1200);
   loadPools();
 }
 function refreshDeployedUI(){
@@ -81,7 +83,15 @@ $("themeBtn").onclick = ()=>{ const d = document.documentElement.dataset.theme==
 document.querySelectorAll(".tab").forEach(b=> b.onclick = ()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); b.classList.add("active"); ["swap","pool","wrap"].forEach(k=> $("tab-"+k).hidden = k!==b.dataset.tab); });
 
 async function connect(){
-  if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); $("mmOpen").hidden = false; return; }
+  if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); showMmOpen(); return; }
+  // Request accounts FIRST, explicitly: eth_requestAccounts is the call that
+  // makes the wallet show its site-connection confirmation to a user who has
+  // not authorised this origin yet. (If the origin is already authorised in
+  // the wallet, it returns silently — that is the wallet's normal behaviour
+  // and no dApp can force the prompt to reappear.) Doing it before the chain
+  // switch also means the confirmation is never blocked behind a switch/add
+  // failure on wallets whose switch handling is flaky.
+  await window.ethereum.request({method:"eth_requestAccounts"});
   provider = new ethers.BrowserProvider(window.ethereum);
   const hexId = "0x"+CFG.chainId.toString(16);
   const addParams = [{chainId:hexId, chainName:CFG.chainName, nativeCurrency:{name:"QOMX",symbol:"QOMX",decimals:18}, rpcUrls:[CFG.rpcUrl], blockExplorerUrls:[CFG.explorer]}];
