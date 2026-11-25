@@ -57,14 +57,25 @@ function driftAbort(shownOut, freshOut, slipPct){ if(shownOut === null || shownO
 
 function showMmOpen(){ const l = $("mmOpenLink"); if(l) l.href = "https://metamask.app.link/dapp/" + location.host + location.pathname; $("mmOpen").hidden = false; }
 
+// The Connect button is ALWAYS shown, whether or not a wallet provider has
+// been detected: wallet browsers often inject window.ethereum late, so
+// detection happens at click time (connect() re-acquires the provider via
+// waitForEthereum) — never by hiding the button, and the no-wallet guidance
+// is shown only when a click still finds no wallet after the wait.
+function wireEth(){ if(window.ethereum && !ethWired){ ethWired = true; window.ethereum.on?.("accountsChanged", accs => { if(!accs || !accs.length) clearConnectedUI(); else refreshConnection(); }); window.ethereum.on?.("chainChanged", ()=>refreshConnection()); $("mmOpen").hidden = true; if($("netNotice").textContent === t("noWallet")) $("netNotice").hidden = true; tryRestore(); } }
+async function waitForEthereum(timeoutMs){
+  if(window.ethereum) return true;
+  const deadline = Date.now() + timeoutMs;
+  while(Date.now() < deadline){ await new Promise(r=>setTimeout(r, 100)); if(window.ethereum){ wireEth(); return true; } }
+  return !!window.ethereum;
+}
+
 async function init(){
   readProvider = new ethers.JsonRpcProvider(CFG.rpcUrl, CFG.chainId);
   applyLang(); refreshDeployedUI(); renderTokButtons();
   try{ const n = await readProvider.getNetwork(); console.log("RPC chain", n.chainId.toString()); }catch(e){ $("netNotice").hidden=false; $("netNotice").textContent = "RPC unreachable: "+CFG.rpcUrl; }
-  const wireEth = ()=>{ if(window.ethereum && !ethWired){ ethWired = true; window.ethereum.on?.("accountsChanged", accs => { if(!accs || !accs.length) clearConnectedUI(); else refreshConnection(); }); window.ethereum.on?.("chainChanged", ()=>refreshConnection()); $("mmOpen").hidden = true; tryRestore(); } };
   wireEth();
   window.addEventListener("ethereum#initialized", wireEth, {once:true});
-  setTimeout(()=>{ if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); showMmOpen(); } }, 1200);
   loadPools();
 }
 function refreshDeployedUI(){
@@ -122,7 +133,10 @@ async function refreshConnection(){
   }
 }
 async function connect(){
-  if(!window.ethereum){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); showMmOpen(); return; }
+  // Re-acquire the provider at click time, waiting briefly for a late
+  // injection; only a wallet that is STILL absent after the wait earns the
+  // no-wallet guidance (the button itself stays visible either way).
+  if(!window.ethereum && !(await waitForEthereum(2000))){ $("netNotice").hidden=false; $("netNotice").textContent = t("noWallet"); showMmOpen(); return; }
   // Request accounts FIRST, explicitly: eth_requestAccounts is the call that
   // makes the wallet show its site-connection confirmation to a user who has
   // not authorised this origin yet. (If the origin is already authorised in
