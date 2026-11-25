@@ -84,6 +84,7 @@ function refreshDeployedUI(){
   // Swap button while no wallet is connected or no quote is displayed —
   // observed in the 2026-11-25 audit's live smoke test).
   if(!deployed()){ $("swapBtn").disabled = true; $("liqBtn").disabled = true; $("liqRemoveBtn").disabled = true; }
+  else $("liqBtn").disabled = !account; // Add Liquidity is gated on connection here; Swap stays owned by quoteSwap, Remove by refreshLp
   renderTokButtons();
 }
 function applyLang(){
@@ -110,6 +111,7 @@ function setConnectedUI(){
 function clearConnectedUI(){
   account = null; signer = null;
   $("connectBtn").textContent = t("connect");
+  $("swapBtn").disabled = true; $("liqBtn").disabled = true;
   $("swapInBal").textContent = ""; $("swapOutBal").textContent = ""; $("lpBal").textContent = "";
   updatePctRow();
 }
