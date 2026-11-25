@@ -1,5 +1,12 @@
 # Handoff for Teh Fund — Qom DEX addresses
 
+> **Status note (2026-11-25):** this document records the 2026-11-21
+> community deployment. The frontend now connects to Teh Fund's official
+> contracts (see README, "Official DEX connection") and the site no
+> longer has a Deploy tab. Figures below (feeTo unset, pairs 0) describe
+> the community contracts only.
+
+
 _Deployed on-chain 2026-11-21 and verified by live reads (code present at
 all three addresses, Factory feeTo = unset, feeToSetter = the dedicated wallet 0x570AE9e37d209d6Db818d54Bfc05c4D90696c40a (transferred from the deployer on 2026-11-23 via the site's admin section, one signature; verified on-chain — the deployer retains no admin rights),
 Router02 wired to this Factory + WQOMX). Copy-paste block:_

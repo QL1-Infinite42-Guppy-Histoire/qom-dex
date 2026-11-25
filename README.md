@@ -1,15 +1,17 @@
-# Qom DEX — a normal Uniswap V2-style DEX for the Qom chain
+# QOM DEX — a normal Uniswap V2-style DEX for the QOM chain
 
 Built in response to Teh Fund's 2026-11-21 call: *"Someone should create a
 normal dex like Qomswap. After that I can create Q stablecoin on Qom chain
 and make a pool and bridge there."*
 
-This repo is the DEX itself: contracts + a static frontend. The Q
-stablecoin, its pool and the bridge are Teh Fund's side, after deployment.
+This repo holds the DEX contracts (the 2026-11-21 community deployment
+below) + the static frontend, which now connects to Teh Fund's official
+contracts (2026-11-24, see "Official DEX connection"). The Q stablecoin
+exists, and its QOMX pool is live on the official DEX.
 
-**Live site:** https://ql1-infinite42-guppy-histoire.github.io/qom-dex/
+**Live site:** https://qomdex.com/
 
-## Chain (this is Qom, NOT QL1)
+## Chain (this is QOM, not QL1)
 
 | | |
 | --- | --- |
@@ -36,7 +38,7 @@ Swap fee: **0.3%** (standard V2). Factory `feeTo` starts **unset**
 
 ## Official DEX connection (2026-11-24)
 
-On 2026-11-24 Teh Fund deployed the **official** Qom DEX contracts himself,
+On 2026-11-24 Teh Fund deployed the **official** QOM DEX contracts himself,
 and this repo's frontend (the GitHub Pages site above) now connects to them:
 
 - `WQOMX` — `0x837a9389C412b2dfca2B97E511305B2B08B96572`
@@ -52,6 +54,11 @@ wrapped-native token (deposit/withdraw, 18 decimals, supply 0);
 Factory `feeToSetter` = Teh Fund's deployer `0x77096a50f1B2B9CE2fac9c0EDcc676C1aeD32BFb`;
 `feeTo` = `0x58C2264175e4252e1938aC42cfbdC92Eac33CE3c` (set by Teh Fund on
 2026-11-24, so the protocol fee is ON for these contracts).
+
+Update (later on 2026-11-24): the Q/QOMX pair
+`0x53578385cAb6BA7563F8BB493C1D4bfB63b5bc7B` was created and the first
+real swap was done (100 QOMX → 0.132399 Q). The pool is live; liquidity
+is still thin.
 
 The 2026-11-21 community deployment below stays on-chain untouched — only
 the frontend config (`docs/config.js`) switched. The official QOMX ERC-20
@@ -74,6 +81,10 @@ Against `https://rpc.qomx.io` (chain 33303, block ≈ 64,079 at check time):
 
 ## Deploy (user signs; no keys in this repo, ever)
 
+> **Note (2026-11-24):** the site no longer has a Deploy tab — the
+> frontend now connects to Teh Fund's official contracts. This section
+> is kept as the record of the 2026-11-21 community deployment.
+
 Open the site's **Deploy** tab with a wallet holding **≥ 600 QOMX**
 (the chain's gas price is high: ~53,571 gwei at check time, so the three
 deployments cost roughly **460 QOMX** in gas) and click 1 → 2 → 3.
@@ -86,8 +97,8 @@ for Teh Fund is generated on the Deploy tab and in
 
 ## Frontend
 
-Static site in `docs/` (GitHub Pages). Swap, add/remove liquidity,
-wrap/unwrap QOMX⇄WQOMX, custom ERC-20 import by address. Every action is
+Static site in `docs/` (GitHub Pages, served at qomdex.com). Swap,
+add/remove liquidity, a live pools list, custom ERC-20 import by address. Every action is
 gated on live reads: a pair with no pool / no reserves shows
 "quote unavailable" instead of a fake number. JA / EN, light-first theme.
 
@@ -102,7 +113,7 @@ gated on live reads: a pair with no pool / no reserves shows
   Router02 `0xD0199c4EA87e4CfCc221f2efBC9f161a1331B1F4`
   (feeTo unset; feeToSetter was the deployer `0xa33e…73A23` at deployment, transferred 2026-11-23 to `0x570A…c40a`; Router wiring matches)
 - [x] **Frontend connected to Teh Fund's official DEX contracts — 2026-11-24** (see "Official DEX connection" above; community deployment stays on-chain)
-- [ ] First real pool + swap — on the official Factory (no pairs exist yet, on either deployment)
+- [x] **First real pool + swap on the official Factory — done 2026-11-24**: Q/QOMX pair `0x53578385cAb6BA7563F8BB493C1D4bfB63b5bc7B`; first swap 100 QOMX → 0.132399 Q. The community Factory still has no pairs.
 
 ## License
 

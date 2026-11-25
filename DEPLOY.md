@@ -1,5 +1,12 @@
 # Deploy guide — Qom DEX
 
+> **Status note (2026-11-25):** this document records the 2026-11-21
+> community deployment. The frontend now connects to Teh Fund's official
+> contracts (see README, "Official DEX connection") and the site no
+> longer has a Deploy tab. Figures below (feeTo unset, pairs 0) describe
+> the community contracts only.
+
+
 Deployment is done **from your own wallet** on the site. No private key
 ever leaves your device; this repo contains bytecode + ABI only.
 
