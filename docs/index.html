@@ -34,6 +34,7 @@
   <nav class="tabs">
     <button class="tab active" data-tab="swap" data-i18n="tabSwap">Swap</button>
     <button class="tab" data-tab="pool" data-i18n="tabPool">Pool</button>
+    <button class="tab" data-tab="limit" data-i18n="tabLimit">Limit</button>
   </nav>
 
   <!-- SWAP -->
@@ -108,6 +109,24 @@
 
     <h2 data-i18n="poolsTitle">Pools</h2>
     <div id="poolList" class="pool-list"><p class="muted">…</p></div>
+  </section>
+
+  <!-- LIMIT (phase 1: password-gated "in preparation" panel; no contract yet) -->
+  <section id="tab-limit" class="card" hidden>
+    <h2 data-i18n="limitTitle">Limit orders</h2>
+    <div id="limitGate">
+      <p class="note" data-i18n="limitGateNote"></p>
+      <div class="row">
+        <input id="limitPw" type="password" autocomplete="off">
+        <button id="limitUnlockBtn" class="btn primary" data-i18n="limitUnlock">Unlock</button>
+      </div>
+      <p class="status warn" id="limitPwStatus"></p>
+    </div>
+    <div id="limitBody" hidden>
+      <p class="notice warn" data-i18n="limitSoonTitle"></p>
+      <p class="note" data-i18n="limitSoonBody"></p>
+      <button class="btn primary big" disabled data-i18n="limitCreateBtn">Create order</button>
+    </div>
   </section>
 
   <!-- Token picker -->
